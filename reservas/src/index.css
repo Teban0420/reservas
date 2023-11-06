@@ -15,11 +15,16 @@
 .formulario__reservas {
     margin-top: 30px;
     margin-left: 15px;
+    
 }
 .salir {
     margin-top: 15px;
 }
 .carrusel{
     margin-top: 3px;
+    width: 100%;
+}
+.tab {
+    margin-left: 20px;
     width: 100%;
 }

@@ -1,25 +1,20 @@
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useEffect, useContext, useState} from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Form, Input, Row, Col } from 'antd'
+import { Button, Row, Col, Tabs } from 'antd'
 import { LogoutOutlined } from '@ant-design/icons' 
 import { ApiContext } from '../../context/ApiContext'
+import { Formulario } from './formulario'
 
-
+const onChange = (key) => {
+    console.log(key)
+}
 export const Reservas = () => {
-
-  const [form] = Form.useForm();
-  const [clientReady, setClientReady] = useState(false);
-  const navigate = useNavigate()
-
-  // uso el context
-  const [ auth, guardarAuth ] = useContext(ApiContext)
-
-  // To disable submit button at the beginning.
-  useEffect(() => {
-
-    setClientReady(true);
     
-  }, []);
+    // uso el context
+    const [ auth, guardarAuth ] = useContext(ApiContext)    
+    const navigate = useNavigate()
+
+    
 
   useEffect( () => {
 
@@ -28,10 +23,6 @@ export const Reservas = () => {
             navigate('/')
         }
   })
-
-  const onFinish = (values) => {
-    console.log('Finish:', values);
-  };
 
   const salir = () => {  
     
@@ -56,80 +47,28 @@ export const Reservas = () => {
                 </Col>
             </Row>
 
-            <Form 
-                className='formulario__reservas'
-                form={form} 
-                name="horizontal_login" 
-                layout="inline" 
-                onFinish={onFinish} >
-                    
-            <Form.Item
-                name="origin"
-                rules={[
-                {
-                    required: true,
-                    message: 'Please input origin!',
-                },]}                
-               
-            >
+            <Tabs
+                className='tab'
+                onChange={onChange}
+                type="card"
+                items={new Array(1).fill(null).map((_, i) => {
+                const id = String(i + 1);
+                    return {
+                        label: 'Shipment',
+                        key: id,
+                        children: <Formulario /> ,
+                    };
+                })}
+             />
 
-            <Input  placeholder="Origin" />
-            </Form.Item>
+            
 
-            <Form.Item
-                name="dest"
-                rules={[
-                {
-                    required: true,
-                    message: 'Please input dest!',
-                },]}
-                
-                // wrapperCol={{
-                //     span: 12,
-                // }}
-            >
+         
 
-            <Input
-            type="text"
-            placeholder="Dest"
-            />
-
-            </Form.Item>
-
-            <Form.Item
-                name="fecha"
-                rules={[
-                    {
-                        required: true,
-                        message: 'Please input Date!'
-                    }
-                ]}
-            >
-        
-            <Input
-                type='date'
-            />
-
-            </Form.Item>
-
-         <Form.Item shouldUpdate>
-            {() => (
-            <Button
-                type="primary"
-                htmlType="submit"
-                disabled={
-                !clientReady ||
-                !form.isFieldsTouched(true) ||
-                !!form.getFieldsError().filter(({ errors }) => errors.length).length
-                }
-            >
-                Search
-                </Button>
-            )}
-            </Form.Item>
-        </Form>
+            
     </>
     )
-}    
+} 
+  
         
     
