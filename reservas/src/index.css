@@ -13,8 +13,9 @@
     text-align: center;
 }
 .formulario__reservas {
-    margin-top: 30px;
+    margin-top: 20px;
     margin-left: 15px;
+    gap: 10px;
     
 }
 .salir {
@@ -27,4 +28,8 @@
 .tab {
     margin-left: 20px;
     width: 100%;
+}
+.formulario_div {
+    width: min(100%, 1200px);
+    margin: 0 auto; 
 }

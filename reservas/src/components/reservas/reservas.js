@@ -59,14 +59,9 @@ export const Reservas = () => {
                         children: <Formulario /> ,
                     };
                 })}
-             />
-
-            
-
-         
-
-            
-    </>
+                
+             />      
+        </>
     )
 } 
   

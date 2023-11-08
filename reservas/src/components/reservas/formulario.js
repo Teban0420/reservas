@@ -1,28 +1,73 @@
 import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Form, Input, Row, Col } from 'antd'
+import { Button, Form, Input } from 'antd'
 import { LogoutOutlined } from '@ant-design/icons' 
+import { Bookings } from '../../api/Bookings';
 
 export const Formulario = () => {
 
-    const [form] = Form.useForm();
-    const [clientReady, setClientReady] = useState(false);
     const navigate = useNavigate()
 
-    // To disable submit button at the beginning.
-    useEffect(() => {
+    const [form] = Form.useForm();
 
-        setClientReady(true);
-    
-    }, []);
+    const [reserva, setReserva] = useState({
+        'agentAccountNumber': '',
+        'airWaybill': {
+          'prefix': '279',
+          'referenceType': 'AIR WAYBILL'
+        },
+        'destinationAirportCode': '',
+        'natureOfGoods': '',
+        'originAirportCode': '',
+        'pieces': 0,
+        'segments': [],
+        'weight': {}
+    });
 
+    // leer datos del formulario
+    const actualizarState = e => {
+
+        setReserva({
+            ...reserva,
+            [e.target.name] : e.target.value
+        })
+    }
+
+    // funcion para activar el formulario
     const onFinish = (values) => {
         console.log('Finish:', values);
+        CrearBooking(); 
     };
+
+    const CrearBooking = async() => {
+
+        const resp = await Bookings.post('/bookings', reserva, {
+            headers: {
+                "apikey": "EnbX12j02DDHFrAoqjaq3FIkmTGncrrk",
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+              }
+        })
+
+        console.log(resp)
+        
+    }
+
+    const validar_reserva = () => {
+
+        const {agentAccountNumber, destinationAirportCode, natureOfGoods, originAirportCode, 
+                pieces, segments, weight } = reserva
+        
+        let valido = !agentAccountNumber.length || !destinationAirportCode.length 
+                     || !natureOfGoods.length || !originAirportCode.length || !pieces.length || !segments.length || !weight.length
+        
+        return valido
+        
+    }
 
     return (
         <>
-
+        <div className='formulario_div'>
           <Form 
                 className='formulario__reservas'
                 form={form} 
@@ -31,7 +76,7 @@ export const Formulario = () => {
                 onFinish={onFinish} >
                     
                 <Form.Item label="Origin"
-                    name="origin"
+                    name="originAirportCode"
                     rules={[
                     {
                         required: true,
@@ -45,7 +90,7 @@ export const Formulario = () => {
                 </Form.Item>
 
                 <Form.Item label="Destination"
-                    name="destination"
+                    name="destinationAirportCode"
                     rules={[
                     {
                         required: true,
@@ -163,18 +208,15 @@ export const Formulario = () => {
                 {() => (
                 <Button
                     type="primary"
-                    htmlType="submit"
-                    disabled={
-                    !clientReady ||
-                    !form.isFieldsTouched(true) ||
-                    !!form.getFieldsError().filter(({ errors }) => errors.length).length
-                    }
-            >
+                    htmlType="submit" 
+                    // disabled={validar_reserva()}                   
+                >
                 Search
                 </Button>
             )}
             </Form.Item>
-        </Form>  
-        </>
+            </Form>  
+        </div>
+    </>
     )
 }
