@@ -1,9 +1,8 @@
-import React, { useContext, useState } from 'react'
-import { Button, Checkbox, Form, Input, Typography } from 'antd';
+import React, { useContext } from 'react'
+import { Button,  Form, Input, Typography } from 'antd';
 import { ApiContext } from '../../context/ApiContext';
 import { Routes, useNavigate, Route } from 'react-router-dom';
-import { Reservas } from '../reservas/reservas';
-const { Title, Text } = Typography
+const { Title} = Typography
 
 
 export const Login = () => {

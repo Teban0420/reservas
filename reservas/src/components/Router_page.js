@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
-import { HomeOutlined, LoginOutlined, LogoutOutlined } from '@ant-design/icons';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom'
+import { HomeOutlined, LoginOutlined } from '@ant-design/icons';
+import { Layout, Menu, theme } from 'antd';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom'
 import { About } from './About';
 import { Contact } from './Contact';
 import { Login } from './auth/Login';
@@ -98,7 +98,7 @@ export const Router_page = () => {
                     <Route path="/about" Component={About} />                    
                     <Route path="/contact" Component={Contact} />                    
                     <Route path="/login" Component={Login} />                                       
-                    <Route path="/reservas" Component={Reservas} />                                       
+                    <Route path="/reservas" Component={Reservas} />                                                                             
                     <Route path="*" element={<Navigate to="/" replace />} />
 
                 </Routes>

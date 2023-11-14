@@ -3,63 +3,68 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Form, Input } from 'antd'
 import { LogoutOutlined } from '@ant-design/icons' 
 import { Bookings } from '../../api/Bookings';
+import { Availability } from '../../api/Availability';
+import { listadoVuelos } from '../listadoVuelos'
 
 export const Formulario = () => {
 
     const navigate = useNavigate()
 
-    const [form] = Form.useForm();
-
-    const [reserva, setReserva] = useState({
-        'agentAccountNumber': '',
-        'airWaybill': {
-          'prefix': '279',
-          'referenceType': 'AIR WAYBILL'
-        },
-        'destinationAirportCode': '',
-        'natureOfGoods': '',
-        'originAirportCode': '',
-        'pieces': 0,
-        'segments': [],
-        'weight': {}
+    const [availability, setavailability] = useState({
+        accountNumber: '',
+        carrierCodes: '',
+        originAirportCode: '',
+        destinationAirportCode: '',
+        departureOn: '',
+        weight: ''
     });
-
-    // leer datos del formulario
-    const actualizarState = e => {
-
-        setReserva({
-            ...reserva,
-            [e.target.name] : e.target.value
-        })
-    }
 
     // funcion para activar el formulario
     const onFinish = (values) => {
-        console.log('Finish:', values);
-        CrearBooking(); 
+        
+        setavailability({
+            accountNumber: '14000110001',
+            carrierCodes: 'B6',
+            originAirportCode: values.originAirportCode,
+            destinationAirportCode: values.destinationAirportCode,
+            departureOn: '2023-11-14T20:30:00',
+            weight: values.weight
+        })
+        
+        vuelos(); 
     };
 
-    const CrearBooking = async() => {
+    const vuelos = async () => {
 
-        const resp = await Bookings.post('/bookings', reserva, {
-            headers: {
-                "apikey": "EnbX12j02DDHFrAoqjaq3FIkmTGncrrk",
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-              }
-        })
+        try {
+            
+            const respuesta = await Availability.get(`
+            /availability?accountNumber=${availability.accountNumber}&carrierCodes=${availability.carrierCodes}
+            &originAirportCode=${availability.originAirportCode}&destinationAirportCode=${availability.destinationAirportCode}
+            &departureOn=${availability.departureOn}&weight=${availability.weight}`);
 
-        console.log(resp)
-        
+            <listadoVuelos />
+
+            console.log(respuesta)
+
+        } catch (error) {
+            console.log(error)
+            
+        }
+
     }
 
-    const validar_reserva = () => {
+    const validar= () => {
 
-        const {agentAccountNumber, destinationAirportCode, natureOfGoods, originAirportCode, 
-                pieces, segments, weight } = reserva
+        const { accountNumber,
+                carrierCodes,
+                originAirportCode,
+                destinationAirportCode,
+                departureOn,
+                weight } = availability
         
-        let valido = !agentAccountNumber.length || !destinationAirportCode.length 
-                     || !natureOfGoods.length || !originAirportCode.length || !pieces.length || !segments.length || !weight.length
+        let valido = !accountNumber.length || !carrierCodes.length 
+                     || !originAirportCode.length || !destinationAirportCode.length || !departureOn.length || !weight.length
         
         return valido
         
@@ -67,10 +72,10 @@ export const Formulario = () => {
 
     return (
         <>
-        <div className='formulario_div'>
+         <div className='formulario_div'>
+
           <Form 
                 className='formulario__reservas'
-                form={form} 
                 name="horizontal_login" 
                 layout="inline" 
                 onFinish={onFinish} >
@@ -85,7 +90,11 @@ export const Formulario = () => {
                 
                 >
 
-                <Input  placeholder="Origin*" />
+                <Input 
+                    type='text'  
+                    placeholder="Origin*"  
+                    value={availability.originAirportCode}
+                />
 
                 </Form.Item>
 
@@ -101,120 +110,40 @@ export const Formulario = () => {
                 <Input
                     type="text"
                     placeholder="Destination*"
+                    value={availability.destinationAirportCode}
                 />
 
                 </Form.Item>
 
-                <Form.Item label="Shipping Date"
-                    name="shipping_date"
+                <Form.Item
+                    label='weight'
+                    name='weight'
                     rules={[
                         {
                             required: true,
-                            message: 'Please Shipping Date!'
-                        }
-                    ]}
+                            message: 'Please input weight!',
+                        },]}
                 >
-        
-                <Input
-                    type='date'
+
+                <Input 
+                    type='text' 
+                    placeholder='Weight*' 
+                    value={availability.weight}
                 />
 
                 </Form.Item>
 
-                <Form.Item label="Arrival Date"
-                    name="arrival_date"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input Arrival Date'
-                        }
-                    ]}
-                >
-                    <Input
-                        type='date'
-                    />
-
+                <Form.Item shouldUpdate>
+                    {() => (
+                    <Button
+                        type="primary"
+                        htmlType="submit" 
+                        // disabled={validar()}                   
+                    >
+                    Search
+                    </Button>
+                )}
                 </Form.Item>
-
-                <Form.Item label="Product"
-                    name="product"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please Input Product'
-                        }
-                    ]}
-                >
-
-                <Input type='text' placeholder='Product'/>
-                    
-                </Form.Item>
-
-                <Form.Item 
-                    label="Commodity"
-                    name="commodity"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please Input Commodity'
-                        }
-                    ]}
-                >
-                
-                <Input type='text' placeholder='Commodity' />
-
-                </Form.Item>
-
-                <Form.Item 
-                    label="Shipment Description"
-                    name="shippment_description"
-                    rules={[{ required: true, message: 'Please Input Shipment Description'}]}
-                >
-                
-                <Input type='text' placeholder='Shipment Description' />
-
-                </Form.Item>
-
-                <Form.Item
-                    label="SCC"
-                    name="scc"
-                >
-                
-                <Input type='number' min="1"  max="100"/>
-
-                </Form.Item>
-
-                <Form.Item
-                    label="Pieces"
-                    name="pieces"
-                    rules={[{ required: true, message: 'Please Input Pieces'}]}
-                >
-
-                <Input type='text' placeholder='Pieces' />
-
-                </Form.Item>
-
-                <Form.Item
-                    label="Weight"
-                    name="weight"
-                    rules={[{required: true, message: 'Please Input Weight'}]}
-                >
-                
-                <Input type='text' placeholder='Weight' />
-
-                </Form.Item>
-
-            <Form.Item shouldUpdate>
-                {() => (
-                <Button
-                    type="primary"
-                    htmlType="submit" 
-                    // disabled={validar_reserva()}                   
-                >
-                Search
-                </Button>
-            )}
-            </Form.Item>
             </Form>  
         </div>
     </>
