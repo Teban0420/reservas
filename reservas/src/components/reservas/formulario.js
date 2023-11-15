@@ -1,14 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Input } from 'antd'
-import { LogoutOutlined } from '@ant-design/icons' 
 import { Bookings } from '../../api/Bookings';
 import { Availability } from '../../api/Availability';
-import { listadoVuelos } from '../listadoVuelos'
+import { ListadoVuelos } from '../vuelos/listadoVuelos'
+
 
 export const Formulario = () => {
 
     const navigate = useNavigate()
+    const [ listado, setlistado ] = useState([])
 
     const [availability, setavailability] = useState({
         accountNumber: '',
@@ -37,15 +38,10 @@ export const Formulario = () => {
     const vuelos = async () => {
 
         try {
+           
+            const respuesta = await Availability.get(`/availability?accountNumber=${availability.accountNumber}&carrierCodes=${availability.carrierCodes}&originAirportCode=${availability.originAirportCode}&destinationAirportCode=${availability.destinationAirportCode}&departureOn=${availability.departureOn}&weight=${availability.weight}`);
             
-            const respuesta = await Availability.get(`
-            /availability?accountNumber=${availability.accountNumber}&carrierCodes=${availability.carrierCodes}
-            &originAirportCode=${availability.originAirportCode}&destinationAirportCode=${availability.destinationAirportCode}
-            &departureOn=${availability.departureOn}&weight=${availability.weight}`);
-
-            <listadoVuelos />
-
-            console.log(respuesta)
+            setlistado(respuesta.data.routes)
 
         } catch (error) {
             console.log(error)
@@ -145,6 +141,11 @@ export const Formulario = () => {
                 )}
                 </Form.Item>
             </Form>  
+
+            {
+                (listado.length > 0) ? <ListadoVuelos listado={listado}/> : ''            
+            }
+            
         </div>
     </>
     )
