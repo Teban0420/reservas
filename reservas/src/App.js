@@ -1,6 +1,7 @@
 import React, {Fragment, useContext} from 'react'
-import { PaginaInicio } from './components/PaginaInicio';
+// import { PaginaInicio } from './components/pages/PaginaInicio';
 import { ApiProvider, ApiContext } from './context/ApiContext';
+import { AppRouter } from './router/AppRouter';
 
 
 function App() {
@@ -10,7 +11,7 @@ function App() {
     <>
       <Fragment>
         <ApiProvider value={[auth, guardarAuth]}>
-          <PaginaInicio />
+          <AppRouter />
         </ApiProvider>
       </Fragment>
     </>

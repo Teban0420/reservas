@@ -1,5 +1,5 @@
 import React, {  useContext, useEffect, useState } from 'react'
-import { ApiContext } from '../context/ApiContext'
+import { ApiContext } from '../../context/ApiContext'
 import { useNavigate } from 'react-router-dom'
 
 export const Contact = () => {

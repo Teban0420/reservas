@@ -6,8 +6,6 @@ import {
 
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 
-import { Router_page } from './Router_page';
-import { Home } from './home/Home';
 const { Header, Content, Footer } = Layout;
 
 
@@ -21,7 +19,7 @@ export const PaginaInicio = () => {
     return(
         <Layout className="layout">
             
-            <Router_page />
+            {/* <Router_page /> */}
 
             
       {/* <Content

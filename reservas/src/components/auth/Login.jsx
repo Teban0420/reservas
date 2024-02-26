@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { Button,  Form, Input, Typography } from 'antd';
 import { ApiContext } from '../../context/ApiContext';
-import { Routes, useNavigate, Route } from 'react-router-dom';
+import { useNavigate  } from 'react-router-dom';
 const { Title} = Typography
 
 
@@ -36,6 +36,10 @@ export const Login = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+
+  const volver = () => {
+      navigate('/');
+  }
 
     return(
       <>
@@ -88,12 +92,25 @@ export const Login = () => {
             span: 16,
           }}
       >
-        <Button type="primary" htmlType="submit">
+
+        <Button 
+          type="primary" 
+          htmlType="submit"
+        >
           Submit
         </Button>
+
       </Form.Item>
     </Form> 
-           
+
+      <Button 
+          type="primary" 
+          danger htmlType="submit"
+          onClick={volver}
+      >
+        Volver
+      </Button>
+    
     </div>
       </>
     )
