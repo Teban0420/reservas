@@ -1,7 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Input } from 'antd'
-import { Bookings } from '../../api/Bookings';
 import { Availability } from '../../api/Availability';
 import { ListadoVuelos } from '../vuelos/listadoVuelos'
 
@@ -11,60 +10,53 @@ export const Formulario = () => {
     const navigate = useNavigate()
     const [ listado, setlistado ] = useState([])
 
-    const [availability, setavailability] = useState({
-        accountNumber: '',
-        carrierCodes: '',
-        originAirportCode: '',
-        destinationAirportCode: '',
-        departureOn: '',
-        weight: ''
-    });
+    const [availability, setavailability] = useState({});
 
     // funcion para activar el formulario
-    const onFinish = (values) => {
-        
-        setavailability({
+    const onFinish = ({originAirportCode, destinationAirportCode, weight}) => {  
+      
+        setavailability({            
             accountNumber: '14000110001',
             carrierCodes: 'B6',
-            originAirportCode: values.originAirportCode,
-            destinationAirportCode: values.destinationAirportCode,
-            departureOn: '2023-11-14T20:30:00',
-            weight: values.weight
-        })
-        
-        vuelos(); 
+            originAirportCode: originAirportCode,
+            destinationAirportCode: destinationAirportCode,
+            departureOn: '2024-02-26T20:30:00',
+            weight: weight
+        })     
+                
+        vuelos(availability); 
     };
 
-    const vuelos = async () => {
+    const vuelos = async (availability) => {
 
-        try {
-           
-            const respuesta = await Availability.get(`/availability?accountNumber=${availability.accountNumber}&carrierCodes=${availability.carrierCodes}&originAirportCode=${availability.originAirportCode}&destinationAirportCode=${availability.destinationAirportCode}&departureOn=${availability.departureOn}&weight=${availability.weight}`);
-            
-            setlistado(respuesta.data.routes)
+        const {accountNumber, carrierCodes, departureOn, destinationAirportCode, originAirportCode, weight } = availability;
+        const url = `availability?accountNumber=${accountNumber}&carrierCodes=${carrierCodes}&originAirportCode=${originAirportCode}&destinationAirportCode=${destinationAirportCode}&departureOn=${departureOn}&weight=${weight}`;
+
+        try {          
+            const respuesta = await Availability.get(url);  
+            setlistado(respuesta.data.routes)         
 
         } catch (error) {
-            console.log(error)
-            
+            console.log(error)            
         }
 
     }
 
-    const validar= () => {
+    // const validar= () => {
 
-        const { accountNumber,
-                carrierCodes,
-                originAirportCode,
-                destinationAirportCode,
-                departureOn,
-                weight } = availability
+    //     const { accountNumber,
+    //             carrierCodes,
+    //             originAirportCode,
+    //             destinationAirportCode,
+    //             departureOn,
+    //             weight } = availability
         
-        let valido = !accountNumber.length || !carrierCodes.length 
-                     || !originAirportCode.length || !destinationAirportCode.length || !departureOn.length || !weight.length
+    //     let valido = !accountNumber.length || !carrierCodes.length 
+    //                  || !originAirportCode.length || !destinationAirportCode.length || !departureOn.length || !weight.length
         
-        return valido
+    //     return valido
         
-    }
+    // }
 
     return (
         <>
@@ -133,14 +125,14 @@ export const Formulario = () => {
                     {() => (
                     <Button
                         type="primary"
-                        htmlType="submit" 
+                        htmlType="submit"                        
                         // disabled={validar()}                   
                     >
                     Search
                     </Button>
                 )}
                 </Form.Item>
-            </Form>  
+            </Form> 
 
             {
                 (listado.length > 0) ? <ListadoVuelos listado={listado}/> : ''            

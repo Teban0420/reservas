@@ -14,8 +14,6 @@ export const Reservas = () => {
     const [ auth, guardarAuth ] = useContext(ApiContext)    
     const navigate = useNavigate()
 
-    
-
   useEffect( () => {
 
         if(auth.token === ''){

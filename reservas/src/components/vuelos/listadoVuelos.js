@@ -3,8 +3,10 @@ import { Collapse, Button} from 'antd';
 import { Vuelos } from './vuelos';
 
 
-export const ListadoVuelos = ({listado}) => {    
-
+export const ListadoVuelos = ({listado}) => {  
+    
+    console.log(listado)
+    
     const [ vuelos, setvuelos ] = useState(listado)
 
     let items = []
@@ -24,6 +26,7 @@ export const ListadoVuelos = ({listado}) => {
         segment.forEach( e => {
             objeto.label = <span style={{color: 'rgba(255,255,255,0.8)'}}> {e.onload.code}- {e.offload.code} </span>
             objeto.children = <p>
+                
                     {e.transportMeans.scheduledDeparture}-{e.transportMeans.scheduledArrival}
                     
                     <Button 
