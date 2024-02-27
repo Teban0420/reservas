@@ -27,7 +27,11 @@ export const ListadoVuelos = ({listado}) => {
             objeto.label = <span style={{color: 'rgba(255,255,255,0.8)'}}> {e.onload.code}- {e.offload.code} </span>
             objeto.children = <p>
                 
-                    {e.transportMeans.scheduledDeparture}-{e.transportMeans.scheduledArrival}
+                    {e.transportMeans.scheduledDeparture} 
+                    
+                    <br />
+                    
+                    {e.transportMeans.scheduledArrival}
                     
                     <Button 
                         type="primary" 
@@ -37,7 +41,7 @@ export const ListadoVuelos = ({listado}) => {
                         }}
                     >
                         SELECT  
-                        </Button>
+                    </Button>
                 </p>
         })
         
@@ -52,9 +56,11 @@ export const ListadoVuelos = ({listado}) => {
             size='small'
             style={{
                 marginTop: 40,
+                marginLeft: 10,
                 marginBottom: 40,
-                backgroundColor: '#001529',
-                width: 1000
+                // backgroundColor: '#001527',
+                backgroundColor: '#65B5C8',
+                width: 900
             }}            
             items={items} 
             defaultActiveKey={['1']} 

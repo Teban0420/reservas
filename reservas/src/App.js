@@ -1,12 +1,12 @@
 import React, {Fragment, useContext} from 'react'
-// import { PaginaInicio } from './components/pages/PaginaInicio';
 import { ApiProvider, ApiContext } from './context/ApiContext';
 import { AppRouter } from './router/AppRouter';
 
 
 function App() {
 
-    const [ auth, guardarAuth ] = useContext(ApiContext)
+  const [ auth, guardarAuth ] = useContext(ApiContext);
+  
   return (
     <>
       <Fragment>

@@ -16,10 +16,10 @@ export const Reservas = () => {
 
   useEffect( () => {
 
-        if(auth.token === ''){
+    if(auth.token === ''){
 
-            navigate('/')
-        }
+        navigate('/')
+    }
   })
 
   const salir = () => {  

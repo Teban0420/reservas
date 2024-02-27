@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { Button,  Form, Input, Typography } from 'antd';
 import { ApiContext } from '../../context/ApiContext';
-import { useNavigate  } from 'react-router-dom';
+import { useNavigate, Link  } from 'react-router-dom';
 const { Title} = Typography
 
 
@@ -27,9 +27,9 @@ export const Login = () => {
     guardarAuth({
         token: 'ABUKSIU35698751236',
         auth: true
-    })
+    });
 
-    navigate('/reservas')
+    navigate('/formulario')
     
   };
   
@@ -43,9 +43,9 @@ export const Login = () => {
 
     return(
       <>
-      <div
-          className="formulario"          
-        >
+      <div className="container-sm"> 
+        <div className='formulario'>                
+
         <Title level={2} >Iniciar Sesión</Title> 
           
           <Form
@@ -54,7 +54,7 @@ export const Login = () => {
                 span: 8,
               }}
               wrapperCol={{
-                span: 12,
+                span: 8,
               }}
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
@@ -93,6 +93,13 @@ export const Login = () => {
           }}
       >
 
+      <Link 
+         className='link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover p-3'
+         to="/"
+      >
+         Home
+      </Link>      
+
         <Button 
           type="primary" 
           htmlType="submit"
@@ -100,18 +107,12 @@ export const Login = () => {
           Submit
         </Button>
 
+
       </Form.Item>
     </Form> 
 
-      <Button 
-          type="primary" 
-          danger htmlType="submit"
-          onClick={volver}
-      >
-        Volver
-      </Button>
-    
-    </div>
+      </div>
+    </div> 
       </>
     )
 }

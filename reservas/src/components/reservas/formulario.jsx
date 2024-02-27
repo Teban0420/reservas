@@ -5,7 +5,7 @@ import { Availability } from '../../api/Availability';
 import { ListadoVuelos } from '../vuelos/listadoVuelos'
 
 
-export const Formulario = () => {
+export const Formulario = () => { 
 
     const navigate = useNavigate()
     const [ listado, setlistado ] = useState([])
@@ -134,9 +134,9 @@ export const Formulario = () => {
                 </Form.Item>
             </Form> 
 
-            {
-                (listado.length > 0) ? <ListadoVuelos listado={listado}/> : ''            
-            }
+                {
+                    (listado.length > 0) ? <ListadoVuelos listado={listado}/> : ''            
+                }
             
         </div>
     </>

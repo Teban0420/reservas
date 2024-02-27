@@ -1,14 +1,10 @@
 import { HomeOutlined, LoginOutlined } from '@ant-design/icons';
-import { Layout, Menu, theme } from 'antd';
-import {Link, Routes, Route, Navigate } from 'react-router-dom'
-import { About, Contact, Home, PaginaInicio } from '../pages';
-import { Formulario } from '../reservas/formulario';
+import { Layout, Menu, theme} from 'antd';
+import {Link } from 'react-router-dom';
+
 const { Header } = Layout;
 
 export const Navegacion = () => {
-
-    // const [ auth, guardarAuth ] = useContext(ApiContext)
-    // const navigate = useNavigate()
 
     const {
         token: { colorBgContainer },
@@ -29,11 +25,10 @@ export const Navegacion = () => {
         key: 3
       },
       {
-        label: <Link to="/login">Login</Link>,
+        label: <Link to="/login" >Login</Link>,
         key: 4,
         icon: <LoginOutlined />
-      }
-      
+      }      
     ];
     
     return(
@@ -53,18 +48,11 @@ export const Navegacion = () => {
                       mode="horizontal"
                       defaultSelectedKeys={['1']}
                       items= {items}
-                  />    
+                  />  
+
+          
           </Header>  
 
-              <Routes>
-
-                <Route path="/" Component={Home} />                    
-                <Route path="/about" Component={About} />                    
-                <Route path="/contact" Component={Contact} />                                                                                                
-                <Route path="/reservas" Component={Formulario} />                                                                                                
-                {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
-
-            </Routes>
       </Layout>
         
     )
