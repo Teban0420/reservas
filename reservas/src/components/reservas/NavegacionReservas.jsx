@@ -1,11 +1,13 @@
 import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { MenuFoldOutlined, MenuUnfoldOutlined, UploadOutlined, RightSquareTwoTone, 
-         VideoCameraOutlined} from '@ant-design/icons';
-import { Layout, Menu, Button, theme, Col } from 'antd';
+import { Link, Route, Routes, useNavigate } from 'react-router-dom';
+
+import { MenuFoldOutlined, MenuUnfoldOutlined, UploadOutlined, 
+         RightSquareTwoTone, VideoCameraOutlined} from '@ant-design/icons';
+
+import { Layout, Menu, Button, theme } from 'antd';
+
 import { ApiContext } from '../../context/ApiContext';
 import { Formulario } from './formulario';
-
 
 const { Header, Sider, Content } = Layout;
 
@@ -105,9 +107,11 @@ export const NavegacionReservas = () => {
               }}
             >
 
-            <Formulario />              
+              <Routes>
+                <Route path='/' Component={Formulario}/>             
+              </Routes>
               
-          </Content>
+            </Content>
       </Layout>
     </Layout>
   );

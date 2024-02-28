@@ -10,26 +10,27 @@ export const Formulario = () => {
     const navigate = useNavigate()
     const [ listado, setlistado ] = useState([])
 
-    const [availability, setavailability] = useState({});
-
     // funcion para activar el formulario
-    const onFinish = ({originAirportCode, destinationAirportCode, weight}) => {  
-      
-        setavailability({            
+    const onFinish = ({originAirportCode, destinationAirportCode, weight}) => {     
+    
+        let availability = {
             accountNumber: '14000110001',
-            carrierCodes: 'B6',
+            carrierCodes: 'B6',           
             originAirportCode: originAirportCode,
             destinationAirportCode: destinationAirportCode,
             departureOn: '2024-02-26T20:30:00',
             weight: weight
-        })     
-                
+        }
+                        
         vuelos(availability); 
+
+        availability = {};
     };
 
     const vuelos = async (availability) => {
 
-        const {accountNumber, carrierCodes, departureOn, destinationAirportCode, originAirportCode, weight } = availability;
+        const {accountNumber, carrierCodes, departureOn, destinationAirportCode, 
+                originAirportCode, weight } = availability;
         const url = `availability?accountNumber=${accountNumber}&carrierCodes=${carrierCodes}&originAirportCode=${originAirportCode}&destinationAirportCode=${destinationAirportCode}&departureOn=${departureOn}&weight=${weight}`;
 
         try {          
@@ -62,26 +63,28 @@ export const Formulario = () => {
         <>
          <div className='formulario_div'>
 
-          <Form 
+          <Form                 
                 className='formulario__reservas'
                 name="horizontal_login" 
-                layout="inline" 
+                layout="inline"                
                 onFinish={onFinish} >
                     
                 <Form.Item label="Origin"
                     name="originAirportCode"
                     rules={[
-                    {
-                        required: true,
-                        message: 'Please input origin!',
-                    },]}                
+                        {
+                            required: true,
+                            message: 'Please input origin!',
+                        },
+                        {max: 3}
+                    ]}  
+                    hasFeedback              
                 
                 >
 
                 <Input 
                     type='text'  
-                    placeholder="Origin*"  
-                    value={availability.originAirportCode}
+                    placeholder="Origin*"                     
                 />
 
                 </Form.Item>
@@ -89,16 +92,18 @@ export const Formulario = () => {
                 <Form.Item label="Destination"
                     name="destinationAirportCode"
                     rules={[
-                    {
-                        required: true,
-                        message: 'Please input dest!',
-                    },]}
+                        {
+                            required: true,
+                            message: 'Please input dest!',
+                        },
+                        {max: 3}
+                    ]}
+                    hasFeedback
                 >
 
                 <Input
                     type="text"
-                    placeholder="Destination*"
-                    value={availability.destinationAirportCode}
+                    placeholder="Destination*"                   
                 />
 
                 </Form.Item>
@@ -110,34 +115,32 @@ export const Formulario = () => {
                         {
                             required: true,
                             message: 'Please input weight!',
-                        },]}
+                        },
+                    ]}
+                    hasFeedback
                 >
 
                 <Input 
                     type='text' 
-                    placeholder='Weight*' 
-                    value={availability.weight}
+                    placeholder='Weight*'                       
                 />
 
                 </Form.Item>
 
-                <Form.Item shouldUpdate>
-                    {() => (
+                <Form.Item >
+                    
                     <Button
                         type="primary"
-                        htmlType="submit"                        
-                        // disabled={validar()}                   
+                        htmlType="submit"                                        
                     >
                     Search
                     </Button>
-                )}
+                
                 </Form.Item>
-            </Form> 
-
+            </Form>
                 {
                     (listado.length > 0) ? <ListadoVuelos listado={listado}/> : ''            
-                }
-            
+                }            
         </div>
     </>
     )

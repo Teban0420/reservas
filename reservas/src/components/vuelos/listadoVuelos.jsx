@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { Collapse, Button} from 'antd';
 import { Vuelos } from './vuelos';
+import { Spinner } from '../reservas/Spinner';
 
 
-export const ListadoVuelos = ({listado}) => {  
-    
-    console.log(listado)
+export const ListadoVuelos = ({listado}) => {      
     
     const [ vuelos, setvuelos ] = useState(listado)
 
-    let items = []
-    let segment = []
+    let items = [];
+    let segment = [];    
+
+    if(items.length ==  0) {
+        <Spinner />
+    } 
     
     vuelos.forEach( (vuelo, i) => {
 
@@ -45,11 +48,10 @@ export const ListadoVuelos = ({listado}) => {
                 </p>
         })
         
-        items.push(objeto)          
+        items.push(objeto);               
     
-    })
-
-
+    });  
+    
     return (
 
         <Collapse 

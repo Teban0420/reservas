@@ -12,16 +12,16 @@ export const Navegacion = () => {
 
     const items = [
       {
-        label: <Link to="/">Home</Link>,
+        label: <Link to="/pages/">Home</Link>,
         key: 1,
         icon: <HomeOutlined />
       },
       {
-        label: <Link to="/about">About</Link>,
+        label: <Link to="/pages/about">About</Link>,
         key: 2
       },
       {
-        label: <Link to="/contact">Contact</Link>,
+        label: <Link to="/pages/contact">Contact</Link>,
         key: 3
       },
       {
