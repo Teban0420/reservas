@@ -74,12 +74,11 @@ export const Formulario = () => {
                     rules={[
                         {
                             required: true,
-                            message: 'Please input origin!',
+                            message: 'Please input origin',
                         },
                         {max: 3}
                     ]}  
-                    hasFeedback              
-                
+                    hasFeedback             
                 >
 
                 <Input 
@@ -94,7 +93,7 @@ export const Formulario = () => {
                     rules={[
                         {
                             required: true,
-                            message: 'Please input dest!',
+                            message: 'Please input dest',
                         },
                         {max: 3}
                     ]}
@@ -109,12 +108,12 @@ export const Formulario = () => {
                 </Form.Item>
 
                 <Form.Item
-                    label='weight'
+                    label='Weight (LB)'
                     name='weight'
                     rules={[
                         {
                             required: true,
-                            message: 'Please input weight!',
+                            message: 'Please input weight',
                         },
                     ]}
                     hasFeedback
@@ -122,7 +121,7 @@ export const Formulario = () => {
 
                 <Input 
                     type='text' 
-                    placeholder='Weight*'                       
+                    placeholder='Weight (LB)*'                       
                 />
 
                 </Form.Item>

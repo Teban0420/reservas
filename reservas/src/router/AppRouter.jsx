@@ -10,7 +10,8 @@ export const AppRouter = () => {
                 <Route  path='/' element={<Navigate to='/pages' />} />                        
                 <Route path='login' element={<Login />} />                 
                 <Route path='/pages/*' element={<PagesRoutes />} />                 
-                <Route path='/formulario/*' element={<ReservasRoutes />} />                 
+                <Route path='/formulario/*' element={<ReservasRoutes />} /> 
+                <Route path="*" element={<Navigate to="/pages" replace />} />                
             </Routes>        
         </>
     )

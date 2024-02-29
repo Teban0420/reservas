@@ -13,7 +13,7 @@ export const PagesRoutes = () => {
                 <Route path="/" Component={Home} />                    
                 <Route path="/about" Component={About} />                    
                 <Route path="/contact" Component={Contact} />                                                                                                                                                                                          
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
             </Routes>      
         </>
     )
