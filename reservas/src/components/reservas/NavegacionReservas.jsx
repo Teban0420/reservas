@@ -8,6 +8,7 @@ import { Layout, Menu, Button, theme } from 'antd';
 
 import { ApiContext } from '../../context/ApiContext';
 import { Formulario } from './formulario';
+import { Reserva } from './Reserva';
 
 const { Header, Sider, Content } = Layout;
 
@@ -52,7 +53,7 @@ export const NavegacionReservas = () => {
               icon: <RightSquareTwoTone />,
             },
             {
-              label: <Link to="/formulario/fligths">Booking</Link>,
+              label: <Link to="/formulario/booking">Booking</Link>,
               key: '2',
               icon: <VideoCameraOutlined />,
             },
@@ -109,6 +110,7 @@ export const NavegacionReservas = () => {
 
               <Routes>
                 <Route path='/' Component={Formulario}/>             
+                <Route path='/booking' Component={Reserva}/>             
               </Routes>
               
             </Content>

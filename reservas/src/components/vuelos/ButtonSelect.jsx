@@ -8,8 +8,8 @@ export const BtnSelect = (segment) => {
 
     const Enviar = () => {
         
-        navigate('/formulario/fligths', {
-            state: { userData: segment}
+        navigate('/formulario/booking', {
+            state: { segmentData: segment}
         });
     }
 

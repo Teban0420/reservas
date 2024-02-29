@@ -7,7 +7,7 @@ import { ListadoVuelos } from '../vuelos/listadoVuelos'
 
 export const Formulario = () => { 
 
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
     const [ listado, setlistado ] = useState([])
 
     // funcion para activar el formulario
