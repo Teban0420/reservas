@@ -1,13 +1,12 @@
 import React, { useMemo } from 'react';
 import { Collapse} from 'antd';
-// import { Vuelos } from './vuelos';
 import { Spinner } from '../reservas/Spinner';
 import { formatoVuelos } from './helpers/formatoVuelos';
 
 
-export const ListadoVuelos = ({listado}) => {      
+export const ListadoVuelos = ({listado, reserva}) => {  
     
-    const vuelos = useMemo( () => formatoVuelos(listado), [listado]);   
+    const vuelos = useMemo( () => formatoVuelos(listado, reserva), [listado]);   
     
     if(!vuelos) {
         return <Spinner />
@@ -27,6 +26,7 @@ export const ListadoVuelos = ({listado}) => {
             }}            
             items={vuelos} 
             defaultActiveKey={['1']} 
+            reserva={reserva}
         />
     )
 }

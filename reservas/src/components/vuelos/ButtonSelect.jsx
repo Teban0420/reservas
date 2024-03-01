@@ -1,28 +1,80 @@
 
 import { useNavigate } from 'react-router-dom';
-import { Button} from 'antd';
+import { Button, Popconfirm } from 'antd';
+import {  useMemo, useState} from 'react';
+import { infoReserva } from './helpers/infoReserva';
+import { Bookings } from '../../api/Bookings';
 
-export const BtnSelect = (segment) => {
 
-    const navigate = useNavigate();
+export const BtnSelect = ({segment, reserva}) => {    
 
-    const Enviar = () => {
+    const navigate = useNavigate();    
+    const datos = useMemo( () => infoReserva(reserva, segment), [segment]);   
+    
+    const [open, setOpen] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
         
-        navigate('/formulario/booking', {
-            state: { segmentData: segment}
-        });
-    }
+     // navigate('/formulario/booking', {
+     //     state: { bookingData: datos}
+    // });
+    
+    const showPopconfirm = () => {
+        setOpen(true);
+    };
+    
+    const handleOk = () => {
+        setConfirmLoading(true);
 
+        crearReserva(datos);        
+    
+        setTimeout(() => {
+          setOpen(false);
+          setConfirmLoading(false);
+        }, 2000);
+    };
+    
+    const handleCancel = () => {        
+        setOpen(false);
+    };
+
+    const crearReserva = async (reserva) => {
+        
+        try {
+            
+            const respuesta = await Bookings.post('v2', reserva);
+
+            if(respuesta.status == 200){
+                navigate('/formulario/booking');
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    
     return(
-        <Button 
-            type="primary" 
-            size='small'
-            style={{
-                marginLeft: 630
-            }}            
-            onClick={Enviar}
-        >
-            SELECT  
-        </Button>
+        <>      
+            <Popconfirm
+                title="Flight"
+                description="Seleccionar este vuelo?"
+                open={open}
+                onConfirm={handleOk}
+                okButtonProps={{ loading: confirmLoading }}
+                onCancel={handleCancel}
+            >
+
+                <Button 
+                    type="primary"
+                    size='small'
+                    onClick={showPopconfirm} 
+                    style={{
+                        marginLeft: 630
+                    }} 
+                >
+                 SELECT
+                 </Button>
+            </Popconfirm>
+
+        </>
     )
 }

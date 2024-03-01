@@ -1,18 +1,17 @@
 import React, {useState} from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button, Form, Input } from 'antd'
 import { Availability } from '../../api/Availability';
-import { ListadoVuelos } from '../vuelos/listadoVuelos'
+import { ListadoVuelos } from '../vuelos/listadoVuelos';
 
+let reserva = {};
 
 export const Formulario = () => { 
 
-    // const navigate = useNavigate()
-    const [ listado, setlistado ] = useState([])
+    const [ listado, setlistado ] = useState([]);
 
     // funcion para activar el formulario
-    const onFinish = ({originAirportCode, destinationAirportCode, weight}) => {     
-    
+    const onFinish = ({originAirportCode, destinationAirportCode, weight, Date, natureOfGoods, pieces }) => {     
+       
         let availability = {
             accountNumber: '14000110001',
             carrierCodes: 'B6',           
@@ -20,6 +19,20 @@ export const Formulario = () => {
             destinationAirportCode: destinationAirportCode,
             departureOn: '2024-02-26T20:30:00',
             weight: weight
+        }
+
+         reserva = {
+            'agentAccountNumber': '00000001116',
+            'airWaybill': {
+                'prefix': "279",
+                'referenceType': 'AIR WAYBILL'
+            },
+            'destinationAirportCode': destinationAirportCode,
+            'natureOfGoods': natureOfGoods,
+            'originAirportCode': originAirportCode,
+            'pieces': pieces,
+            'segments': [],
+            'weight':{'amount':weight, 'unit': 'LB' }
         }
                         
         vuelos(availability); 
@@ -126,19 +139,71 @@ export const Formulario = () => {
 
                 </Form.Item>
 
+                    <Form.Item
+                        label="Date"
+                        name="Date"                
+                    >
+
+                    <Input 
+                        type='date'                        
+                    />
+
+                </Form.Item>
+
+                <Form.Item
+                    label="OfGoods"
+                    name="natureOfGoods"   
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input',
+                        },
+                        {max: 3}
+                    ]}
+                    hasFeedback              
+                >
+
+                <Input 
+                    type='text'
+                    placeholder='nature of goods'               
+                />
+
+                </Form.Item>
+
+                <Form.Item
+                    label="pieces"
+                    name="pieces"   
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input',
+                        },
+                        {max: 3}
+                    ]}
+                    hasFeedback              
+                >
+
+                <Input 
+                    type='number'
+                    placeholder='pieces'               
+                />
+
+                </Form.Item>
+
                 <Form.Item >
                     
                     <Button
                         type="primary"
                         htmlType="submit"                                        
                     >
-                    Search
+                    Search Flights
                     </Button>
                 
-                </Form.Item>
+                </Form.Item> 
+               
             </Form>
                 {
-                    (listado.length > 0) ? <ListadoVuelos listado={listado}/> : ''            
+                    (listado.length > 0) ? <ListadoVuelos listado={listado} reserva={reserva}/> : ''            
                 }            
         </div>
     </>

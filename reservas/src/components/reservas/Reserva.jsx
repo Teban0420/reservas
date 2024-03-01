@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Form, Input } from 'antd';
 import { Notificacion } from './Notificacion';
 import { Bookings } from '../../api/Bookings';
@@ -6,26 +6,28 @@ import { Bookings } from '../../api/Bookings';
 
 export const Reserva = () => {
 
+    const navigate = useNavigate();
     const {state} = useLocation(); 
+
     let segment; 
 
     const onFinish = ({natureOfGoods, pieces, weight }) => {
 
-        const reserva = {
-            'agentAccountNumber': '00000001116',
-            'airWaybill': {
-                'prefix': "279",
-                'referenceType': 'AIR WAYBILL'
-            },
-            'destinationAirportCode': segment.offload.code,
-            'natureOfGoods': natureOfGoods,
-            'originAirportCode': segment.onload.code,
-            'pieces': pieces,
-            'segments': [segment],
-            'weight':{'amount':weight, 'unit': 'LB' }
-        }
+        // const reserva = {
+        //     'agentAccountNumber': '00000001116',
+        //     'airWaybill': {
+        //         'prefix': "279",
+        //         'referenceType': 'AIR WAYBILL'
+        //     },
+        //     'destinationAirportCode': segment.offload.code,
+        //     'natureOfGoods': natureOfGoods,
+        //     'originAirportCode': segment.onload.code,
+        //     'pieces': pieces,
+        //     'segments': [segment],
+        //     'weight':{'amount':weight, 'unit': 'LB' }
+        // }
         
-        crearReserva(reserva);
+        
     };
 
     if(state !== null){        
@@ -34,22 +36,6 @@ export const Reserva = () => {
 
     else{
         return <Notificacion />
-    }
-
-    const crearReserva = async (reserva) => {
-        
-        try {
-            
-            const respuesta = await Bookings.post('v2', reserva);
-
-            if(respuesta.status == 200){
-                console.log('creado correctamente')
-                // return <NotificacionExito />
-            }
-
-        } catch (error) {
-            console.log(error);
-        }
     }
             
     return(
