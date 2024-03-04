@@ -44,7 +44,7 @@ export const BtnSelect = ({segment, reserva}) => {
             const respuesta = await Bookings.post('v2', reserva);
 
             if(respuesta.status == 200){
-                navigate('/formulario/booking');
+                navigate('/formulario');
             }
 
         } catch (error) {

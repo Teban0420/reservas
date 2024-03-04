@@ -56,22 +56,6 @@ export const Formulario = () => {
 
     }
 
-    // const validar= () => {
-
-    //     const { accountNumber,
-    //             carrierCodes,
-    //             originAirportCode,
-    //             destinationAirportCode,
-    //             departureOn,
-    //             weight } = availability
-        
-    //     let valido = !accountNumber.length || !carrierCodes.length 
-    //                  || !originAirportCode.length || !destinationAirportCode.length || !departureOn.length || !weight.length
-        
-    //     return valido
-        
-    // }
-
     return (
         <>
          <div className='formulario_div'>

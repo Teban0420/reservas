@@ -1,56 +1,47 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation} from 'react-router-dom';
 import { Button, Form, Input } from 'antd';
 import { Notificacion } from './Notificacion';
-import { Bookings } from '../../api/Bookings';
+import { TrackAndTrace } from '../../api/TrackAndTrace';
+import { useState } from 'react';
+import { DetalleReserva } from './DetalleReserva';
 
 
 export const Reserva = () => {
-
-    const navigate = useNavigate();
+    
     const {state} = useLocation(); 
-
-    let segment; 
-
-    const onFinish = ({natureOfGoods, pieces, weight }) => {
-
-        // const reserva = {
-        //     'agentAccountNumber': '00000001116',
-        //     'airWaybill': {
-        //         'prefix': "279",
-        //         'referenceType': 'AIR WAYBILL'
-        //     },
-        //     'destinationAirportCode': segment.offload.code,
-        //     'natureOfGoods': natureOfGoods,
-        //     'originAirportCode': segment.onload.code,
-        //     'pieces': pieces,
-        //     'segments': [segment],
-        //     'weight':{'amount':weight, 'unit': 'LB' }
-        // }
-        
-        
+    const [ booking, setBooking] = useState({});
+    
+    const onFinish = ({serialNumber}) => {
+        consultar_reserva(serialNumber);    
     };
 
-    if(state !== null){        
-         segment = state.segmentData.segment 
-    }
+    const consultar_reserva = async (serialNumber) => {
 
-    else{
-        return <Notificacion />
-    }
+        const url = `airwaybill?airlinePrefix=950&serialNumber=${serialNumber}`;
+
+        try {
+
+            const respuesta = await TrackAndTrace.get(url);
+            setBooking(respuesta.data);            
             
+        } catch (error) {
+            console.log(error);
+        }
+    }
+      
     return(
         <>            
             <Form
                 name="horizontal"
                 layout="inline"  
                 labelCol={{
-                span: 6,
+                span: 8,
                 }}
                 wrapperCol={{
-                span: 11,
+                span: 12,
                 }}
                 style={{
-                maxWidth: 1200,
+                maxWidth: 800,
                 }}
                 initialValues={{
                 remember: true,
@@ -59,98 +50,36 @@ export const Reserva = () => {
                 autoComplete="off"
             >
 
-                <Form.Item
-                    label="Origin"
-                    name="Origin"                
+                <Form.Item  
+                    label="Awb"                  
+                    name="airlinePrefix"   
+                    wrapperCol={{
+                        span: 6,
+                    }}            
                 >
                     <Input 
                         type='text'
-                        defaultValue={segment.onload.code}                    
+                        defaultValue='279'    
+                        disabled                                 
                     />
 
                 </Form.Item>
 
-                <Form.Item
-                    label="Dest"
-                    name="Dest"                
-                >
-
-                <Input 
-                    type='text'
-                    defaultValue={segment.offload.code}   
-                />
-             
-                </Form.Item>
-
-                <Form.Item
-                    label="Date"
-                    name="Date"                
-                >
-
-                <Input 
-                    type='text'
-                    defaultValue={segment.transportMeans.date}   
-                />
-
-                </Form.Item>
-
-                <Form.Item
-                    label="OfGoods"
-                    name="natureOfGoods"   
+                <Form.Item  
+                    label="Number"                 
+                    name="serialNumber" 
                     rules={[
                         {
                             required: true,
                             message: 'Please input',
                         },
-                        {max: 3}
+                        {min: 8}
                     ]}
-                    hasFeedback              
+                    hasFeedback                 
                 >
-
-                <Input 
-                    type='text'
-                    placeholder='nature of goods'               
-                />
-
-                </Form.Item>
-
-                <Form.Item
-                    label="pieces"
-                    name="pieces"   
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input',
-                        },
-                        {max: 3}
-                    ]}
-                    hasFeedback              
-                >
-
-                <Input 
-                    type='number'
-                    placeholder='pieces'               
-                />
-
-                </Form.Item>
-
-                <Form.Item
-                    label="weight"
-                    name="weight"   
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Please input',
-                        },
-                        {max: 6}
-                    ]}
-                    hasFeedback              
-                >
-
-                <Input 
-                    type='number'
-                    placeholder='weight'               
-                />
+                    <Input 
+                        type='text'                                           
+                    />
 
                 </Form.Item>
            
@@ -166,7 +95,11 @@ export const Reserva = () => {
                 </Button>
 
                 </Form.Item>
-        </Form>
+        </Form>        
+
+            {
+                (Object.entries(booking).length > 0) && <DetalleReserva booking={booking} />          
+            } 
        </>
     )
 }

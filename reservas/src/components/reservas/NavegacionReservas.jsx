@@ -2,13 +2,12 @@ import React, { useContext, useState } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 
 import { MenuFoldOutlined, MenuUnfoldOutlined, UploadOutlined, 
-         RightSquareTwoTone, VideoCameraOutlined} from '@ant-design/icons';
+         RightSquareTwoTone, CalendarOutlined , HomeOutlined } from '@ant-design/icons';
 
 import { Layout, Menu, Button, theme } from 'antd';
 
 import { ApiContext } from '../../context/ApiContext';
-import { Formulario } from './formulario';
-import { Reserva } from './Reserva';
+import { Formulario, Reserva, Home } from './index';
 
 const { Header, Sider, Content } = Layout;
 
@@ -48,17 +47,22 @@ export const NavegacionReservas = () => {
           defaultSelectedKeys={['1']}
           items={[
             {
-              label: <Link to="/formulario">New Bookings</Link>,
+              label: <Link to="/formulario">Home</Link>,
               key: '1',
+              icon: <HomeOutlined  />,
+            },
+            {
+              label: <Link to="/formulario/new">New Booking</Link>,
+              key: '2',
               icon: <RightSquareTwoTone />,
             },
             {
               label: <Link to="/formulario/booking">Booking</Link>,
-              key: '2',
-              icon: <VideoCameraOutlined />,
+              key: '3',
+              icon: <CalendarOutlined />,
             },
             {
-              key: '3',
+              key: '4',
               icon: <UploadOutlined />,
               label: 'nav 3',
             },
@@ -109,7 +113,8 @@ export const NavegacionReservas = () => {
             >
 
               <Routes>
-                <Route path='/' Component={Formulario}/>             
+                <Route path='/' Component={Home}/>             
+                <Route path='/new' Component={Formulario}/>             
                 <Route path='/booking' Component={Reserva}/>             
               </Routes>
               
