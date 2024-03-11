@@ -1,31 +1,40 @@
 
-import React from 'react';
-
+import React, { useMemo, useState } from 'react';
 import { Divider, List, Typography } from 'antd';
-const data = [
-  'Racing car sprays burning fuel into crowd.',
-  'Japanese princess to wed commoner.',
-  'Australian walks 100km after outback crash.',
-  'Man charged over missing wedding girl.',
-  'Los Angeles battles huge wildfires.',
-];
-export const DetalleReserva = (booking) => {    
+import { tracking } from './helpers/tracking';
+import { TablaEvents } from './TablaEvents';
 
+
+export const DetalleReserva = (booking) => { 
+
+  const summary = useMemo( () => tracking(booking), [booking]);
+  const events = Object.values(booking.booking.airwaybill.events);   
+  const [ mostrar, setMostrar] = useState(false);
+ 
+  const mostrarTabla = () => {
+      setMostrar(!mostrar); 
+  }
+ 
     return(
         <>
-            <Divider orientation="left">Details</Divider>
-            <List
-            header={<div>Header</div>}
-            footer={<div>Footer</div>}
-            bordered
-            dataSource={data}
-            renderItem={(item) => (
-                <List.Item>
-                <Typography.Text mark>[ITEM]</Typography.Text> {item}
-                </List.Item>
-            )}
-            />        
-        
+            <Divider orientation="right">Details</Divider>
+              <List
+                header={<div><strong>Summary</strong></div>}
+                footer={ <button className='btn btn-success' onClick={mostrarTabla}>
+                            Show
+                          </button>                        
+                        }                        
+                bordered
+                dataSource={summary}
+                renderItem={(item) => (
+                    <List.Item>              
+                    {item}
+                    </List.Item>
+                )}
+              />
+              {
+                (mostrar) && <TablaEvents events={events} />     
+              }  
       </>
     )
 }

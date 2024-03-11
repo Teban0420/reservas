@@ -57,7 +57,7 @@ export const NavegacionReservas = () => {
               icon: <RightSquareTwoTone />,
             },
             {
-              label: <Link to="/formulario/booking">Booking</Link>,
+              label: <Link to="/formulario/tracking">Tracking</Link>,
               key: '3',
               icon: <CalendarOutlined />,
             },
@@ -115,7 +115,7 @@ export const NavegacionReservas = () => {
               <Routes>
                 <Route path='/' Component={Home}/>             
                 <Route path='/new' Component={Formulario}/>             
-                <Route path='/booking' Component={Reserva}/>             
+                <Route path='/tracking' Component={Reserva}/>             
               </Routes>
               
             </Content>

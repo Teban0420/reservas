@@ -1,6 +1,5 @@
 import { useLocation} from 'react-router-dom';
 import { Button, Form, Input } from 'antd';
-import { Notificacion } from './Notificacion';
 import { TrackAndTrace } from '../../api/TrackAndTrace';
 import { useState } from 'react';
 import { DetalleReserva } from './DetalleReserva';
@@ -98,7 +97,7 @@ export const Reserva = () => {
         </Form>        
 
             {
-                (Object.entries(booking).length > 0) && <DetalleReserva booking={booking} />          
+               (Object.entries(booking).length > 0) && <DetalleReserva booking={booking} />          
             } 
        </>
     )
