@@ -1,76 +1,59 @@
 
-import { useNavigate } from 'react-router-dom';
-import { Button, Popconfirm, Form, Input } from 'antd';
-import {  useMemo, useState} from 'react';
-import { infoReserva } from './helpers/infoReserva';
-import { Bookings } from '../../api/Bookings';
+import { Button, Form, Input } from 'antd';
+import { useState} from 'react';
 
 
-export const BtnSelect = ({segment, reserva}) => {    
+let todos_vuelos = [];
 
-    const navigate = useNavigate();    
-    const datos = useMemo( () => infoReserva(reserva, segment), [segment]);   
-    
-    const [open, setOpen] = useState(false);
-    const [confirmLoading, setConfirmLoading] = useState(false);
+export const BtnSelect = ({segment, reserva}) => {
+
+      
+    const [vuelo_recibido, setvuelo_recibido] = useState(segment);
+    const [reserva_recibida, setreserva_recibida] = useState(reserva);  
+   
     const [ mostrar, setMostrar ] = useState(false);
             
-    const showPopconfirm = () => {
-        // setOpen(true);
+    const showPopconfirm = () => {       
         setMostrar(!mostrar);
     };
-    
-    const handleOk = () => {
-        setConfirmLoading(true);
 
-        crearReserva(datos);        
-    
-        setTimeout(() => {
-          setOpen(false);
-          setConfirmLoading(false);
-        }, 2000);
-    };
-    
-    const handleCancel = () => {        
-        setOpen(false);
-    };
-
-    const onFinish = (values) => {
-        console.log('Success:', values);
-      };
-      const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
-      };
-
-    const crearReserva = async (reserva) => {
+    const onFinish = (values) => {      
         
-        try {
-            
-            const respuesta = await Bookings.post('v2', reserva);
+        setvuelo_recibido({
+            ...vuelo_recibido,
+            pieces: values.Pieces,
+            weight: {amount: values.Weight, unit: 'LB'},
+            volume: {amount: values.Volume, unit: 'MC'}            
+        });
 
-            if(respuesta.status == 200){
-                navigate('/formulario');
-            }
-
-        } catch (error) {
-            console.log(error);
-        }
+        todos_vuelos.push(vuelo_recibido);       
+        
+        setreserva_recibida({
+            ...reserva_recibida,
+            'segments': todos_vuelos
+        });    
+        
+        guardarReserva(reserva_recibida);          
     }
-    
+
+    const guardarReserva = (reserva_final) => {
+        
+        localStorage.setItem('reserva_final', JSON.stringify(reserva_final));
+    }
+
     return(
         <>      
            <br />
                 {
-                    (mostrar) && <div 
+                    (mostrar) && <><div 
                         style={{
                             display: 'flex', 
                             flexDirection: 'row',  
-                            justifyContent: 'flex-start', 
-                            
+                            justifyContent: 'flex-start',                             
                         }}
                 >
-                        <Form
-                            name="oneLineForm"
+                        <Form                            
+                            name={segment.transportMeans.id}
                             layout="inline"
                             onFinish={onFinish}
                             style={{ display: 'flex', gap: '2px', alignItems: 'flex-end' }}
@@ -99,14 +82,20 @@ export const BtnSelect = ({segment, reserva}) => {
                         >
                             <Input placeholder="Volume" />
                         </Form.Item>
+
+                        <Form.Item name="id">
+                            <Input  type='hidden' value={segment.transportMeans.id} />
+                        </Form.Item>
     
                         <Form.Item>
-                            <Button style={{backgroundColor: '#5cb85c', color: 'white'}}   htmlType="submit">
-                                Enviar
-                            </Button>
+                            <Button style={{backgroundColor: '#5cb85c', color: 'white'}}   
+                                    htmlType="submit">
+                                Confirm
+                            </Button>                           
                         </Form.Item>
                     </Form>
                 </div>
+                </>
                 }
 
                 <Button 
@@ -120,7 +109,19 @@ export const BtnSelect = ({segment, reserva}) => {
                  SELECT
                  </Button>
            
-
         </>
     )
 }
+
+
+   
+    
+   
+
+
+      
+
+    
+    
+   
+ 

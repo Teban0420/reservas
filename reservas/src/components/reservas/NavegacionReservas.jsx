@@ -9,11 +9,13 @@ import { Layout, Menu, Button, theme } from 'antd';
 import { ApiContext } from '../../context/ApiContext';
 import { Formulario, Reserva, Home } from './index';
 
+
 const { Header, Sider, Content } = Layout;
 
 export const NavegacionReservas = () => {
 
   const [ auth, guardarAuth] = useContext(ApiContext);
+    
   const navigate = useNavigate();
 
   const [collapsed, setCollapsed] = useState(false);
@@ -111,12 +113,12 @@ export const NavegacionReservas = () => {
                 borderRadius: borderRadiusLG,
               }}
             >
-
-              <Routes>
-                <Route path='/' Component={Home}/>             
-                <Route path='/new' Component={Formulario}/>             
-                <Route path='/tracking' Component={Reserva}/>             
-              </Routes>
+  
+                <Routes>
+                  <Route path='/' Component={Home}/>             
+                  <Route path='/new' Component={Formulario}/>             
+                  <Route path='/tracking' Component={Reserva}/>             
+                </Routes>              
               
             </Content>
       </Layout>

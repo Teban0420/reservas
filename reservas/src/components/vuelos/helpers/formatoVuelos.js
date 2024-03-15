@@ -1,4 +1,6 @@
 
+import { Button, Modal } from 'antd';
+import { BtnEnviarReserva } from "../../reservas/BtnEnviarReserva";
 import { BtnSelect } from "../ButtonSelect";
 
 /*
@@ -11,6 +13,7 @@ export const formatoVuelos = ( listado = {}, reserva = {}) => {
     // tomo los segments ahi se encuentra informacion de los vuelos
     let items = [];
     let segment = []; 
+    let boton = '';
     
     listado.forEach( (vuelo, i) => {
 
@@ -30,7 +33,7 @@ export const formatoVuelos = ( listado = {}, reserva = {}) => {
             objeto.key = Math.floor(Math.random() * (100- 1 + 1) + 1) 
             objeto.vuelo_completo = e    
 
-            objeto.label = <p> 
+            objeto.label = <span> 
                                 <strong style={{color: 'rgba(0,0,0,0.8)'}}> 
                                     {e.onload.code}-{e.offload.code}
                                 </strong> 
@@ -38,20 +41,20 @@ export const formatoVuelos = ( listado = {}, reserva = {}) => {
                                 <span>
                                     {e.transportMeans.reference}
                                 </span>
-                            </p> 
+                            </span> 
 
-                objeto.children =  <p>
+                objeto.children =  <span>
                                     {e.transportMeans.scheduledDeparture}     
                                     <br />                                
                                     {e.transportMeans.scheduledArrival}                                                                  
                                     <br />                                
-                                     <BtnSelect  segment={ objeto.vuelo_completo } reserva={reserva}/>                            
-                                 </p> 
+                                     <BtnSelect  key={e.transportMeans.id} segment={ objeto.vuelo_completo } reserva={reserva}/>                            
+                                 </span> 
                                                                      
         });
         
-        items.push(objeto);               
-    
+        items.push(objeto);       
+        
     });
 
     return items;
