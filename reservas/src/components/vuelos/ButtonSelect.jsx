@@ -3,6 +3,7 @@ import { Button, Form, Input } from 'antd';
 import { useContext, useEffect, useState} from 'react';
 import { ReservaContext } from '../reservas/context/reservaContext';
 
+let newListadoVuelos = [];
 
 export const BtnSelect = ({segment, reserva}) => {
       
@@ -24,17 +25,8 @@ export const BtnSelect = ({segment, reserva}) => {
             volume: {amount: values.Volume, unit: 'MC'} 
         }
                     
-        // setvuelo_recibido({
-        //     ...vuelo_recibido,
-        //     pieces: values.Pieces,
-        //     weight: {amount: values.Weight, unit: 'LB'},
-        //     volume: {amount: values.Volume, unit: 'MC'}            
-        // });
-
-        const newListadoVuelos = [...todos_vuelos, nuevo_vuelo_recibido];
-
-        // Settodos_vuelos(newListadoVuelos);       
-        
+        newListadoVuelos.push(nuevo_vuelo_recibido);       
+      
         let newReserva = {
             ...reserva,
             'segments': newListadoVuelos

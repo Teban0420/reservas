@@ -27,11 +27,7 @@ export const BtnEnviarReserva = () => {
 
     const btn_crear_reserva = async () => {
 
-        console.log(reserva_init)
-        return
-        
-        try {
-            
+        try {            
             const respuesta = await Bookings.post('v2', reserva_init);            
 
             if(respuesta.status == 200){
@@ -80,7 +76,9 @@ export const BtnEnviarReserva = () => {
                                     <span>
                                             {item.onload.code} - {item.offload.code} &nbsp;
                                             {item.transportMeans.reference} {item.transportMeans.date} &nbsp;
-                                            pieces: {item.pieces}  
+                                            pieces: {item.pieces}  &nbsp;
+                                            weight: {item.weight.amount}  &nbsp;
+                                            volume: {item.volume.amount}  
                                     </span>       
                                 </List.Item>
                             )}
