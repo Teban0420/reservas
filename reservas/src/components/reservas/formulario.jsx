@@ -1,44 +1,50 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import { Button, Divider, Form, Input } from 'antd'
 import { Availability } from '../../api/Availability';
-// import { ListadoVuelos } from '../vuelos/listadoVuelos';
 import { Ejemplo } from '../vuelos/Ejemplo';
 import { BtnEnviarReserva } from './BtnEnviarReserva';
 import { ReservaContext } from './context/reservaContext';
+import { getCurrentDate } from './helpers/fechaActual';
 
 
 let reserva = {};
 
-export const Formulario = () => { 
+export const Formulario = () => {     
 
     const [ listado, setlistado ] = useState([]); 
-    const [reserva_init, setReserva_init] = useContext(ReservaContext); 
+    const [ btnEnviarReserva, setBtnEnviarReserva ] = useState(false); 
+
+    const [reserva_init, setReserva_init] = useContext(ReservaContext);  
+    
        
     // funcion para activar el formulario
-    const onFinish = ({originAirportCode, destinationAirportCode, weight, Date, natureOfGoods, pieces }) => {     
+    const onFinish = ({ serial, originAirportCode, destinationAirportCode, weight, Date, arrivalOn, natureOfGoods, pieces }) => {     
        
         let availability = {
             accountNumber: '14000110001',
             carrierCodes: 'B6',           
             originAirportCode: originAirportCode,
             destinationAirportCode: destinationAirportCode,
-            departureOn: '2024-02-26T20:30:00',
+            // departureOn: '2024-02-26T20:30:00',
+            departureOn: Date,
+            arrivalOn: arrivalOn,
             weight: weight
         }
 
-         reserva = {
-            'agentAccountNumber': '00000001116',
-            'airWaybill': {
-                'prefix': "279",
-                'referenceType': 'AIR WAYBILL'
+        setReserva_init({
+            agentAccountNumber: '00000001116',
+            airWaybill: {
+                prefix: '279',
+                referenceType: 'AIR WAYBILL',
+                serial: serial
             },
-            'destinationAirportCode': destinationAirportCode,
-            'natureOfGoods': natureOfGoods,
-            'originAirportCode': originAirportCode,
-            'pieces': pieces,
-            'segments': [],
-            'weight':{'amount':weight, 'unit': 'LB' }
-        }
+            destinationAirportCode: destinationAirportCode,
+            natureOfGoods: natureOfGoods,
+            originAirportCode: originAirportCode,
+            pieces: pieces,
+            segments: [],
+            weight:{ amount:weight, unit: 'LB' }
+        });
                         
         vuelos(availability); 
 
@@ -47,13 +53,13 @@ export const Formulario = () => {
 
     const vuelos = async (availability) => {
 
-        const {accountNumber, carrierCodes, departureOn, destinationAirportCode, 
+        const {accountNumber, carrierCodes, departureOn, arrivalOn, destinationAirportCode, 
                 originAirportCode, weight } = availability;
-        const url = `availability?accountNumber=${accountNumber}&carrierCodes=${carrierCodes}&originAirportCode=${originAirportCode}&destinationAirportCode=${destinationAirportCode}&departureOn=${departureOn}&weight=${weight}`;
+        const url = `availability?accountNumber=${accountNumber}&carrierCodes=${carrierCodes}&originAirportCode=${originAirportCode}&destinationAirportCode=${destinationAirportCode}&departureOn=${departureOn}&arrivalOn=${arrivalOn}&weight=${weight}`;
 
         try {          
             const respuesta = await Availability.get(url);  
-            setlistado(respuesta.data.routes)         
+            setlistado(respuesta.data.routes);                  
 
         } catch (error) {
             console.log(error)            
@@ -63,16 +69,59 @@ export const Formulario = () => {
 
     return (
         <>
-         <div className='formulario_div'>
+         <div >
 
-          <Form                 
-                className='formulario__reservas'
+          <Form                   
                 name="horizontal_login" 
-                layout="inline"                
-                onFinish={onFinish} >
+                layout="inline"  
+                size='small'              
+                onFinish={onFinish}                
+                wrapperCol={{ span: 15 }}
+            >
+
+                <Form.Item  
+                    label="Prefix"                  
+                    name="airlinePrefix"   
+                    style={{width: '15%', marginBottom: '1rem'}}
+                    wrapperCol={{
+                        span: 10,
+                    }}            
+                >
+                    <Input 
+                        type='text'
+                        defaultValue='279'    
+                        disabled                                 
+                    />
+
+                </Form.Item>
                     
-                <Form.Item label="Origin"
+                <Form.Item  
+                    label="Number" 
+                    name="serial" 
+                    style={{ width: '20%', marginBottom: '1rem' }}                    
+                    wrapperCol={{
+                        span: 12,
+                    }} 
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Please input an AWB Number',
+                        },
+                        {min: 8}
+                    ]}
+                    hasFeedback                 
+                >
+                    <Input 
+                        type='text'  
+                        placeholder='Awb Number'                                         
+                    />
+
+                </Form.Item>
+                    
+                <Form.Item 
+                    label="Origin"
                     name="originAirportCode"
+                    style={{ width: '15%', marginBottom: '1rem' }}    
                     rules={[
                         {
                             required: true,
@@ -80,7 +129,7 @@ export const Formulario = () => {
                         },
                         {max: 3}
                     ]}  
-                    hasFeedback             
+                    hasFeedback              
                 >
 
                 <Input 
@@ -90,8 +139,10 @@ export const Formulario = () => {
 
                 </Form.Item>
 
-                <Form.Item label="Destination"
+                <Form.Item 
+                    label="Dest"
                     name="destinationAirportCode"
+                    style={{ width: '15%', marginBottom: '1rem' }}
                     rules={[
                         {
                             required: true,
@@ -111,37 +162,71 @@ export const Formulario = () => {
 
                 <Form.Item
                     label='Weight (LB)'
-                    name='weight'
+                    name='weight' 
+                    style={{ width: '22%', marginBottom: '1rem' }}   
+                    wrapperCol={{
+                        span: 10,
+                    }}                                 
                     rules={[
                         {
                             required: true,
-                            message: 'Please input weight',
+                            message: 'Please input weight',                           
                         },
+                        {
+                            pattern: /^[0-9]+$/,
+                            message: 'can only include numbers.',
+                        },                   
+                       
                     ]}
                     hasFeedback
                 >
 
                 <Input 
-                    type='text' 
+                    type='text'                     
                     placeholder='Weight (LB)*'                       
                 />
 
                 </Form.Item>
 
-                    <Form.Item
-                        label="Date"
-                        name="Date"                
-                    >
+                <Form.Item
+                    label="Dep"
+                    name="Date"   
+                    style={{ width: '22%', marginBottom: '1rem' }}   
+                    wrapperCol={{
+                        span: 13,
+                    }}               
+                > 
 
-                    <Input 
-                        type='date'                        
-                    />
+                <Input 
+                    type='date' 
+                    min={getCurrentDate()}                       
+                />
+
+                </Form.Item>
+
+                <Form.Item
+                    label="Arr"
+                    name="arrivalOn"   
+                    style={{ width: '22%', marginBottom: '1rem' }}   
+                    wrapperCol={{
+                        span: 13,
+                    }}               
+                > 
+
+                <Input 
+                    type='date' 
+                    min={getCurrentDate()}                       
+                />
 
                 </Form.Item>
 
                 <Form.Item
                     label="OfGoods"
-                    name="natureOfGoods"   
+                    name="natureOfGoods" 
+                    style={{ width: '20%', marginBottom: '1rem' }}
+                    wrapperCol={{
+                        span: 10,
+                    }} 
                     rules={[
                         {
                             required: true,
@@ -161,11 +246,16 @@ export const Formulario = () => {
 
                 <Form.Item
                     label="pieces"
-                    name="pieces"   
+                    name="pieces"  
+                    style={{ width: '15%', marginBottom: '1rem' }}                      
                     rules={[
                         {
                             required: true,
                             message: 'Please input',
+                        },
+                        {
+                            pattern: /^[0-9]+$/,
+                            message: 'can only include numbers.',
                         },
                         {max: 3}
                     ]}
@@ -185,7 +275,7 @@ export const Formulario = () => {
                         type="primary"
                         htmlType="submit"                                        
                     >
-                    Search Flights
+                        Search Flights
                     </Button>
                 
                 </Form.Item> 
@@ -195,10 +285,19 @@ export const Formulario = () => {
             <Divider />
            
                 {
-                    (listado.length > 0) ? <Ejemplo listado={listado} reserva={reserva}/>  : ''            
+                         
+                    (listado.length > 0) ? 
+
+                        <Ejemplo 
+                            listado={listado} 
+                            reserva={reserva_init}
+                            btnEnviarReserva={btnEnviarReserva}
+                            setBtnEnviarReserva={setBtnEnviarReserva}
+                        />  
+                        : ''            
                 } 
                 {
-                    (Object.values(reserva_init).length > 0) && <BtnEnviarReserva />
+                    (btnEnviarReserva) && <BtnEnviarReserva />
                 } 
                 
         </div>

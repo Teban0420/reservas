@@ -1,5 +1,5 @@
 import { Button, Modal, List } from 'antd';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bookings } from '../../api/Bookings';
 import { ReservaContext } from './context/reservaContext';
@@ -7,40 +7,70 @@ import { ReservaContext } from './context/reservaContext';
 
 export const BtnEnviarReserva = () => { 
     
+    const [reserva_init, setReserva_init] = useContext(ReservaContext); 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const navigate = useNavigate(); 
 
-    const [reserva_init, setReserva_init] = useContext(ReservaContext);
-  
+    const [cambiarEstado, setCambiarEstado] = useState(false);
+    const navigate = useNavigate();
+
     const showModal = () => {
-      setIsModalOpen(true);     
+      setIsModalOpen(true);   
     };
     
     const handleOk = () => {
-        btn_crear_reserva();
-        setIsModalOpen(false);       
+
+        setCambiarEstado(true)    
+        setIsModalOpen(false);   
     };
 
     const handleCancel = () => {
       setIsModalOpen(false);
     };
 
-    const btn_crear_reserva = async () => {
+    useEffect(() => {
 
-        try {            
-            const respuesta = await Bookings.post('v2', reserva_init);            
+        if(cambiarEstado){
 
-            if(respuesta.status == 200){
-                navigate('/formulario');
+            const btn_crear_reserva = async () => {
+        
+                try {  
+                                                
+                    const respuesta = await Bookings.post('v2', reserva_init); 
+
+                    setReserva_init({ 
+                        agentAccountNumber: '',
+                        airWaybill: {
+                            prefix: "279",
+                            referenceType: 'AIR WAYBILL'
+                        },
+                        destinationAirportCode: '',
+                        natureOfGoods: '',
+                        originAirportCode: '',
+                        pieces: '',
+                        segments: [],
+                        weight:{ amount: '', unit: 'LB' }
+                    }); 
+
+                    localStorage.setItem('send', 'ok');                    
+        
+                    navigate('/formulario');                                       
+                    
+                } catch (error) {
+                    console.log(error);
+                }
+               
             }
 
-        } catch (error) {
-            console.log(error);
+            btn_crear_reserva();
+            setCambiarEstado(false);
         }
-    }
 
+    }, [cambiarEstado]);
+
+    useEffect( () => {}, [reserva_init]);
+
+    
     return(
-
         <div 
             style={{
                 display: 'flex', 
@@ -49,19 +79,19 @@ export const BtnEnviarReserva = () => {
                 paddingTop: '20px'                         
             }}
         > 
+           
             <Button
                 style={{backgroundColor: '#5cb85c', color: 'white'}} 
                 htmlType="submit" 
-                onClick={showModal}                                       
+                onClick={showModal}                                      
             >
                 Enviar
             </Button>
 
-
             <Modal title="BOOKING" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
                 <br />
 
-                {
+                {                    
                     (reserva_init !== null) && <> 
                         <p> <strong>Origin-Dest:</strong> {reserva_init.originAirportCode} - {reserva_init.destinationAirportCode}</p>
                         <p> <strong>Account number:</strong> {reserva_init.agentAccountNumber}</p>
@@ -83,11 +113,9 @@ export const BtnEnviarReserva = () => {
                                 </List.Item>
                             )}
                         />  
-                    </>               
-                    
+                    </>                              
                 }
-                                                
-               
+                                                             
             </Modal>
         </div>
     )

@@ -4,22 +4,30 @@ import { Button, Form, Input } from 'antd';
 import { RightSquareTwoTone } from '@ant-design/icons'
 import { ReservaContext } from '../reservas/context/reservaContext';
 
+
 let newListadoVuelos = [];
 
-export const BtnSelect = ({segment, reserva}) => {
-      
+export const BtnSelect = ({segment, reserva, btnEnviarReserva, setBtnEnviarReserva}) => {    
+    
     const [vuelo_recibido, setvuelo_recibido] = useState(segment);
     const [reserva_init, setReserva_init] = useContext(ReservaContext);   
     const [ mostrar, setMostrar ] = useState(false);
-    const [ todos_vuelos, Settodos_vuelos ] = useState([]);
+    const [ todos_vuelos, Settodos_vuelos ] = useState([]);   
 
+    const valor_localStorage = localStorage.getItem('send');
              
     const showPopconfirm = () => {       
         setMostrar(!mostrar);
     };
 
-    const onFinish = (values) => {  
-        
+    const onFinish = (values) => {        
+
+        if(valor_localStorage === 'ok'){
+
+            localStorage.removeItem('send');
+            newListadoVuelos = [];
+        }
+
         let nuevo_vuelo_recibido = {
             ...vuelo_recibido,
             pieces: values.Pieces,
@@ -31,13 +39,15 @@ export const BtnSelect = ({segment, reserva}) => {
       
         let newReserva = {
             ...reserva,
-            'segments': newListadoVuelos
+            segments: newListadoVuelos
         }
             
-        setReserva_init(newReserva);                   
+        setReserva_init(newReserva);       
+        setBtnEnviarReserva(true);       
  
     }
 
+    
     useEffect( () => {     
                  
     }, [vuelo_recibido])
