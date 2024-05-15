@@ -1,11 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Popconfirm, Form, Input } from 'antd';
+import { Typography } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import queryString from 'query-string';
-import { CancelBooking } from '../../api/Bookings';
+import { Update_Cancel_Booking } from '../../api/Bookings';
 import { ReservaContext } from './context/reservaContext';
+import { TablaVuelosReserva } from './TablaVuelosReserva';
+import { AvailabilityObj } from './helpers/VuelosDisponibles';
+import { Ejemplo } from '../vuelos/Ejemplo';
 
+
+const { Title } = Typography;
 
 export const Booking = () => {
 
@@ -21,26 +27,83 @@ export const Booking = () => {
         }
     }, []);
     
-    const bookingObj = JSON.parse(r);    
-    const { businessId, agent, destination, airWaybillIdentifier, origin, product, shipper, 
-        totalPieces, totalVolume, totalWeight, route } = bookingObj;
-        
+    const bookingObj = JSON.parse(r);  
+
     const [ reserva_init, setReserva_init ] = useContext(ReservaContext);
+    const [ deshabilitado, setDeshabilitado] = useState(true);
+
+    const [ listado, setListado] = useState([]);
+    const [ btnEnviarReserva, setBtnEnviarReserva] = useState(false);  
+
+    const { businessId, agent, destination, airWaybillIdentifier, origin, product, shipper, 
+        totalPieces, totalVolume, totalWeight, route } = bookingObj;     
     
 
-    const onFinish = (values) => {
-        console.log('Success:', values);
-    };
+    const onFinish = async (values) => {
+        
+        const consultarDisponibilidad = await AvailabilityObj(values);
+        setListado(consultarDisponibilidad);    
+        
+        setReserva_init({
+            agentAccountNumber: '00000001116',
+            airWaybill: {
+                prefix: '279',
+                referenceType: 'AIR WAYBILL',
+                serial: values.serial
+            },
+            destinationAirportCode: values.destination,
+            natureOfGoods: values.code,
+            originAirportCode: values.origin,
+            pieces: values.totalPieces,
+            segments: [],
+            weight:{ amount: values.totalWeight, unit: 'LB' }
+        });
+
+        
+    }
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
     };
+
+    const actualizarBooking = async () => {       
+
+        try {
+
+            const actualizar = await Update_Cancel_Booking.put(`v2/bookings/${businessId}`, reserva_init);
+
+            if(actualizar.status === 204) {
+                
+                setReserva_init({ 
+                    agentAccountNumber: '',
+                    airWaybill: {
+                        prefix: "279",
+                        referenceType: 'AIR WAYBILL'
+                    },
+                    destinationAirportCode: '',
+                    natureOfGoods: '',
+                    originAirportCode: '',
+                    pieces: '',
+                    segments: [],
+                    weight:{ amount: '', unit: 'LB' }
+                }); 
+
+                localStorage.setItem('send', 'ok');                    
+    
+                navigate('/formulario');      
+
+            }
+            
+        } catch (error) {
+            console.log(error)
+        }
+    }
       
     const CancelarBooking = async (id) => {
 
         try {
             
-            const peticion = await CancelBooking.post(`v2/bookings/${id}/cancellation-requests`);           
+            const peticion = await Update_Cancel_Booking.post(`v2/bookings/${id}/cancellation-requests`);           
     
             if(peticion.status === 204){
                 navigate('/formulario');
@@ -54,14 +117,63 @@ export const Booking = () => {
 
     return(
         <>
-            <h1>Booking </h1>
+            <Title>Booking</Title>
+
+            <br />
 
             <Form
                 name="basic"               
                 layout='inline'
                 size='small'
+                disabled={deshabilitado}
+                fields={[
+                    {
+                      name: ["airlinePrefix"],
+                      value: airWaybillIdentifier?.airlinePrefix,
+                    },
+                    {
+                      name: ["serial"],
+                      value: airWaybillIdentifier?.serial,
+                    },
+                    {
+                      name: ["agent"],
+                      value: agent?.name,
+                    },
+                    {
+                      name: ["contact"],
+                      value: agent.contact?.phone,
+                    },
+                    {
+                      name: ["shipper"], 
+                      value: shipper?.name,
+                    },
+                    {
+                      name: ["origin"],  
+                      value: origin?.code,
+                    },
+                    {
+                      name: ["destination"],    
+                      value: destination?.code
+                    },
+                    {
+                      name: ["code"],    
+                      value: product?.code 
+                    },
+                    {
+                      name: ["totalPieces"],   
+                      value: totalPieces 
+                    },
+                    {
+                      name: ["totalVolume"],  
+                      value: totalVolume?.amount   
+                    },
+                    {
+                      name: ["totalWeight"],   
+                      value: totalWeight?.amount
+                    },
+                  ]}
                 labelCol={{
-                span: 8,
+                span: 7,
                 }}
                 wrapperCol={{
                 span: 16,
@@ -85,10 +197,7 @@ export const Booking = () => {
                     span: 6,
                 }}
             >
-                <Input 
-                    defaultValue={airWaybillIdentifier.airlinePrefix}
-                    disabled
-                />
+                <Input disabled />
 
             </Form.Item>
 
@@ -99,31 +208,20 @@ export const Booking = () => {
                 wrapperCol={{
                     span: 9,
                 }}
-                rules={[
-                    {
-                    required: true,
-                    message: 'Please input serial',
-                    },
-                ]}
-                >
+                
+            >
                 <Input
                     type='text'
-                    defaultValue={airWaybillIdentifier.serial}
+                    defaultValue={airWaybillIdentifier?.serial}
                 />
             </Form.Item>
 
             <Form.Item
                 label="Agent"
                 name="agent"
-                style={{ marginBottom: '1rem'}}
-                rules={[
-                    {
-                    required: true,
-                    message: 'Please input agent',
-                    },
-                ]}
-                >
-                <Input type='text' defaultValue={agent.name} />
+                style={{ marginBottom: '1rem'}}               
+            >
+                <Input type='text' />
             </Form.Item>
 
             <Form.Item
@@ -134,7 +232,7 @@ export const Booking = () => {
                     span: 11,
                 }}               
             >
-                <Input type='text' defaultValue={agent.contact?.phone} />
+                <Input type='text' />
             </Form.Item>
 
             <Form.Item
@@ -146,7 +244,7 @@ export const Booking = () => {
                 style={{ marginBottom: '1rem'}}
                 
                 >
-                <Input type='text' defaultValue={shipper.name} />
+                <Input type='text' />
             </Form.Item>
 
             <Form.Item
@@ -157,7 +255,7 @@ export const Booking = () => {
                     span: 6,
                 }}               
             >
-                <Input type='text' defaultValue={origin.code} />
+                <Input type='text' />
             </Form.Item>
 
             <Form.Item
@@ -168,7 +266,7 @@ export const Booking = () => {
                     span: 6,
                 }}               
             >
-                <Input type='text' defaultValue={destination.code} />
+                <Input type='text' />
             </Form.Item>
 
             <Form.Item
@@ -179,7 +277,7 @@ export const Booking = () => {
                     span: 10,
                 }}               
             >
-                <Input type='text' defaultValue={product.code} />
+                <Input type='text' />
             </Form.Item>
 
             <Form.Item
@@ -190,7 +288,7 @@ export const Booking = () => {
                     span: 6,
                 }}               
             >
-                <Input type='number' defaultValue={totalPieces} />
+                <Input type='number' />
             </Form.Item>
 
             <Form.Item
@@ -201,7 +299,7 @@ export const Booking = () => {
                     span: 8,
                 }}               
             >
-                <Input type='number' defaultValue={totalVolume.amount} />
+                <Input type='number' />
             </Form.Item>
 
             <Form.Item
@@ -212,38 +310,88 @@ export const Booking = () => {
                     span: 6,
                 }}               
             >
-                <Input type='number' defaultValue={totalWeight.amount} />
+                <Input type='number' />
             </Form.Item>
 
-           {/*  Mostrar los vuelos de la reserva */}
+            {
+                (!deshabilitado) &&                   
+                
+                   <Button type="primary" size="middle" htmlType="submit">  
+                        Search Fligths
+                  </Button>
+            }
 
-           <Button type="primary" htmlType="submit">
-             Save
-          </Button>
+           
             
-            </Form>
+        </Form>        
 
-            <Popconfirm
-                title="Delete the booking"
-                description="Are you sure to delete this booking?"
-                onConfirm={() => CancelarBooking(businessId)}
-                icon={
-                <QuestionCircleOutlined
-                    style={{
-                    color: 'red',
-                    }}
-                />
-                }
-            >
-             <Button 
-                danger
-                style={{marginLeft: '80%'}}
-            >
-                Cancel Booking
-            </Button>
+           {/*  Mostrar los vuelos de la reserva */}
+        <br />
 
-            </Popconfirm>
+        <div >
+            {
+                    
+                (listado.length > 0) 
+                
+                    ? 
+                    <>
+                        <Ejemplo 
+                            listado={listado} 
+                            reserva={reserva_init}                                              
+                        />  
+
+                        
+                        <Button
+                            style={{backgroundColor: '#5cb85c', color: 'white'}}                            
+                            onClick={actualizarBooking}                                      
+                        >
+                            Enviar
+                        </Button>
+
+                    </>
+                        
+                    : 
+
+                    <>
+                        <TablaVuelosReserva route={route} />           
+
+                        <Popconfirm
+                            title="Delete the booking"
+                            description="Are you sure to delete this booking?"
+                            onConfirm={() => CancelarBooking(businessId)}
+                            icon={
+                            <QuestionCircleOutlined
+                                style={{
+                                color: 'red',
+                                }}
+                            />
+                            }
+                        >
+
+                            <Button 
+                                danger
+                                style={{marginLeft: '80%'}}
+                            >
+                                Cancel Booking
+                            </Button>
+    
+                        </Popconfirm>
+    
+                        <Button 
+                            type="primary"  
+                            size="middle" 
+                            style={{marginLeft: 5}}
+                            onClick={ () => setDeshabilitado(!deshabilitado)}
+                        >
+                        {
+                            (deshabilitado) ? 'Edit' : 'Cancel'
+                        }
+                        </Button>   
+                    </>        
+            } 
+                     
+            </div>          
+            
         </>
-
     )
 }
