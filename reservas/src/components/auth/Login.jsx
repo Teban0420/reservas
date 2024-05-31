@@ -1,116 +1,156 @@
-import { useContext } from 'react'
-import { Button,  Form, Input, Typography } from 'antd';
-import { ApiContext } from '../../context/ApiContext';
+import { useContext, useState } from 'react'
 import { useNavigate, Link  } from 'react-router-dom';
-const { Title} = Typography
+import { Button,  Form, Input, Typography, message} from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { ApiContext } from '../../context/ApiContext';
+import { ApiLogin } from '../../api/login';
+import { MsgError } from '../ui/MsgError';
+import { Spinner } from '../ui/Spinner';
 
+
+const { Title} = Typography
 
 export const Login = () => {
 
-  const [ auth, guardarAuth ] = useContext(ApiContext)
+  const [ auth, guardarAuth ] = useContext(ApiContext);
+  const [showError, setShowError] = useState(false);
 
-  const navigate = useNavigate();  
+  const [btnEnviar, setBtnEnviar] = useState(false);
+  const [showSpinner, setShowSpinner] = useState(false);
 
-  const onFinish = ({username, password}) => {
+  const navigate = useNavigate(); 
+  const [messageApi, contextHolder] = message.useMessage();
 
-    // hacer peticion fecth para login
-
-    // try {
-      
-    // } catch (error) {
-      
-    // }
+  const onFinish = async ({user, password}) => {
     
-    localStorage.setItem('token', 'ABUKSIU35698751236')
-    guardarAuth({
-        token: 'ABUKSIU35698751236',
-        auth: true
-    });
+    try {
+      
+      setBtnEnviar(true);
+      setShowSpinner(true);
+      
+      const respuesta = await ApiLogin.post('Authenticate/login', {
+        username: user,
+        password
+      });
 
-    navigate('/formulario')
+      const { sessionid, agents, username, changepassword } = respuesta.data;
+
+      localStorage.setItem('token', sessionid);
+      
+      guardarAuth({
+            token: sessionid,
+            auth: true,
+            agents,
+            username,
+      }); 
+      
+      setShowSpinner(false);
+        
+      navigate('/formulario');
+      
+    } catch (error) {     
+
+      setShowError(true); 
+      msgError();    
+      
+    }     
     
   };
   
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
+  const msgError = () => {
+      messageApi.open({
+        type: 'error',
+        content: 'Something Wrong'
+    });
+  }
 
-  const volver = () => {
-      navigate('/');
+  if(showSpinner){
+    return <Spinner />
   }
 
     return(
-      <>
-      <div className="container"> 
-        <div className='formulario'>                
+      <>         
+        <div className='contenedor_login'>
 
-        <Title level={2} >Login</Title> 
-          
-          <Form
-              name="basic"
-              labelCol={{
-                span: 8,
-              }}
-              wrapperCol={{
-                span: 8,
-              }}
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              autoComplete="off"
-          >
-          <Form.Item
-              label="Username"
-              name="username"
-              rules={[
+          <div className='hero'>
+
+            <div className='logo'>
+                <img  width='250' height='60' src={require('../ui/img/JetBlueCargo.png')} alt="JetBlue Cargo" />
+            </div>
+
+            <div className='login'>                
+
                 {
-                  required: true,
-                  message: 'Please input your username!',
-                },
-              ]}
-          >
-        <Input />
-        </Form.Item>
+                  (showError) && <MsgError msg={contextHolder}  />                     
+                }
 
-        <Form.Item
-            label="Password"
-            name="password"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your password!',
-              },
-            ]}
-        >
-      <Input.Password />
-      </Form.Item>
+                <br />
+                <br />
+                <Form
+                    name="basic"
+                    labelCol={{
+                      span: 6,
+                    }}
+                    wrapperCol={{
+                      span: 16,
+                    }}
+                    onFinish={onFinish}
+                    autoComplete="off"
+                >
+                  <Form.Item          
+                      label={ <UserOutlined style={{fontSize: 20}} />}
+                      name="user"               
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Input username',
+                        },
+                      ]}
+                  >
+                  <Input  placeholder='Username' />
+                 </Form.Item>
 
-      <Form.Item
-          wrapperCol={{
-            offset: 8,
-            span: 16,
-          }}
-      >
+                <Form.Item
+                    label={<LockOutlined style={{fontSize: 20}}/>}
+                    name="password"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Input password',
+                      },
+                    ]}
+                >
+                  <Input.Password  placeholder='Password'/>
+                </Form.Item>
 
-      <Link 
-         className='link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover p-3'
-         to="/"
-      >
-         Home
-      </Link>      
+                <Form.Item
+                    wrapperCol={{
+                      offset: 10,
+                      span: 8,
+                    }}
+                >
+                  <Button 
+                    type="primary" 
+                    htmlType="submit"
+                    style={{backgroundColor: '#1D2758', marginTop: '1rem', color: 'white'}}
+                    disabled={btnEnviar}
+                  >
+                    Login
+                  </Button>
 
-        <Button 
-          type="primary" 
-          htmlType="submit"
-        >
-          Submit
-        </Button>
+                 </Form.Item>
+              </Form> 
 
-
-      </Form.Item>
-    </Form> 
-
-      </div>
-    </div> 
+            </div>
+              <div className='logo'>
+                <span className='year'>{'© '} {new Date().getFullYear()} - </span>
+                <strong className='year'style={{marginRight: 5}}>Powered By</strong> {''}               
+                  <img  width='180' height='40' src={require('../ui/img/aeronexcargologo.png')} alt="Logo" />
+              </div>
+          </div>
+        
+        </div>
+        
       </>
     )
 }

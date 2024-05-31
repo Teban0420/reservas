@@ -5,6 +5,8 @@ import { Ejemplo } from '../vuelos/Ejemplo';
 import { BtnEnviarReserva } from './BtnEnviarReserva';
 import { ReservaContext } from './context/reservaContext';
 import { getCurrentDate } from './helpers/fechaActual';
+import { AvailabilityObj } from './helpers/VuelosDisponibles';
+import { Spinner } from '../ui/Spinner';
 
 
 let reserva = {};
@@ -13,26 +15,22 @@ export const Formulario = () => {
 
     const [ listado, setlistado ] = useState([]); 
     const [ btnEnviarReserva, setBtnEnviarReserva ] = useState(false); 
+    const [ showSpinner, setShowSpinner ] = useState(false); 
 
-    const [reserva_init, setReserva_init] = useContext(ReservaContext);  
-    
+    const [reserva_init, setReserva_init] = useContext(ReservaContext);      
        
     // funcion para activar el formulario
-    const onFinish = ({ serial, originAirportCode, destinationAirportCode, weight, Date, arrivalOn, natureOfGoods, pieces }) => {     
+    const onFinish = async ({ serial, originAirportCode, destinationAirportCode, weight, Date, arrivalOn, natureOfGoods, pieces }) => {     
+            
+        setShowSpinner(true);
+        const consultarDisp = await AvailabilityObj(destinationAirportCode, originAirportCode, weight);
+        
+        setlistado(consultarDisp); 
+        setShowSpinner(false);
        
-        let availability = {
-            accountNumber: '14000110001',
-            carrierCodes: 'B6',           
-            originAirportCode: originAirportCode,
-            destinationAirportCode: destinationAirportCode,
-            // departureOn: '2024-02-26T20:30:00',
-            departureOn: Date,
-            arrivalOn: arrivalOn,
-            weight: weight
-        }
-
         setReserva_init({
-            agentAccountNumber: '00000001116',
+            // agentAccountNumber: '00000001116',
+            agentAccountNumber: 'UTST001',
             airWaybill: {
                 prefix: '279',
                 referenceType: 'AIR WAYBILL',
@@ -44,47 +42,31 @@ export const Formulario = () => {
             pieces: pieces,
             segments: [],
             weight:{ amount:weight, unit: 'LB' }
-        });
-                        
-        vuelos(availability); 
-
-        availability = {};
-    };
-
-    const vuelos = async (availability) => {
-
-        const {accountNumber, carrierCodes, departureOn, arrivalOn, destinationAirportCode, 
-                originAirportCode, weight } = availability;
-        const url = `availability?accountNumber=${accountNumber}&carrierCodes=${carrierCodes}&originAirportCode=${originAirportCode}&destinationAirportCode=${destinationAirportCode}&departureOn=${departureOn}&arrivalOn=${arrivalOn}&weight=${weight}`;
-
-        try {          
-            const respuesta = await Availability.get(url);  
-            setlistado(respuesta.data.routes);                  
-
-        } catch (error) {
-            console.log(error)            
-        }
-
-    }
+        });                        
+    };   
 
     return (
         <>
          <div >
-
           <Form                   
                 name="horizontal_login" 
                 layout="inline"  
                 size='small'              
                 onFinish={onFinish}                
-                wrapperCol={{ span: 15 }}
+                labelCol={{
+                    span: 8,
+                    }}                    
+                    style={{
+                        maxWidth: 1100,
+                    }}
             >
 
                 <Form.Item  
-                    label="Prefix"                  
+                    label="Awb"                  
                     name="airlinePrefix"   
-                    style={{width: '15%', marginBottom: '1rem'}}
+                    style={{ marginBottom: '1rem'}}
                     wrapperCol={{
-                        span: 10,
+                        span: 6,
                     }}            
                 >
                     <Input 
@@ -98,7 +80,7 @@ export const Formulario = () => {
                 <Form.Item  
                     label="Number" 
                     name="serial" 
-                    style={{ width: '20%', marginBottom: '1rem' }}                    
+                    style={{ marginBottom: '1rem' }}                    
                     wrapperCol={{
                         span: 12,
                     }} 
@@ -113,7 +95,7 @@ export const Formulario = () => {
                 >
                     <Input 
                         type='text'  
-                        placeholder='Awb Number'                                         
+                        placeholder='Number'                                         
                     />
 
                 </Form.Item>
@@ -121,7 +103,10 @@ export const Formulario = () => {
                 <Form.Item 
                     label="Origin"
                     name="originAirportCode"
-                    style={{ width: '15%', marginBottom: '1rem' }}    
+                    wrapperCol={{
+                        span: 8,
+                    }}  
+                    style={{ marginBottom: '1rem' }}    
                     rules={[
                         {
                             required: true,
@@ -142,7 +127,10 @@ export const Formulario = () => {
                 <Form.Item 
                     label="Dest"
                     name="destinationAirportCode"
-                    style={{ width: '15%', marginBottom: '1rem' }}
+                    wrapperCol={{
+                        span: 8,
+                    }}  
+                    style={{ marginBottom: '1rem' }}
                     rules={[
                         {
                             required: true,
@@ -161,11 +149,11 @@ export const Formulario = () => {
                 </Form.Item>
 
                 <Form.Item
-                    label='Weight (LB)'
+                    label='Weight'
                     name='weight' 
-                    style={{ width: '22%', marginBottom: '1rem' }}   
+                    style={{ marginBottom: '1rem' }}   
                     wrapperCol={{
-                        span: 10,
+                        span: 8,
                     }}                                 
                     rules={[
                         {
@@ -183,7 +171,7 @@ export const Formulario = () => {
 
                 <Input 
                     type='text'                     
-                    placeholder='Weight (LB)*'                       
+                    placeholder='LB*'                       
                 />
 
                 </Form.Item>
@@ -191,7 +179,7 @@ export const Formulario = () => {
                 <Form.Item
                     label="Dep"
                     name="Date"   
-                    style={{ width: '22%', marginBottom: '1rem' }}   
+                    style={{ marginBottom: '1rem' }}   
                     wrapperCol={{
                         span: 13,
                     }}               
@@ -207,7 +195,7 @@ export const Formulario = () => {
                 <Form.Item
                     label="Arr"
                     name="arrivalOn"   
-                    style={{ width: '22%', marginBottom: '1rem' }}   
+                    style={{marginBottom: '1rem' }}   
                     wrapperCol={{
                         span: 13,
                     }}               
@@ -223,9 +211,9 @@ export const Formulario = () => {
                 <Form.Item
                     label="OfGoods"
                     name="natureOfGoods" 
-                    style={{ width: '20%', marginBottom: '1rem' }}
+                    style={{ marginBottom: '1rem' }}
                     wrapperCol={{
-                        span: 10,
+                        span: 8,
                     }} 
                     rules={[
                         {
@@ -246,8 +234,11 @@ export const Formulario = () => {
 
                 <Form.Item
                     label="pieces"
-                    name="pieces"  
-                    style={{ width: '15%', marginBottom: '1rem' }}                      
+                    name="pieces" 
+                    wrapperCol={{
+                        span: 8,
+                    }}  
+                    style={{ marginBottom: '1rem' }}                      
                     rules={[
                         {
                             required: true,
@@ -273,7 +264,8 @@ export const Formulario = () => {
                     
                     <Button
                         type="primary"
-                        htmlType="submit"                                        
+                        htmlType="submit"     
+                        style={{backgroundColor: '#2981C4', color: 'white'}}                                   
                     >
                         Search Flights
                     </Button>
@@ -283,6 +275,11 @@ export const Formulario = () => {
             </Form>          
           
             <Divider />
+
+            {
+                (showSpinner) &&  <div> <Spinner /> </div>
+                                 
+            }
            
                 {
                          

@@ -1,14 +1,12 @@
 import React, { useContext, useState } from 'react';
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
-
-import { MenuFoldOutlined, MenuUnfoldOutlined, UploadOutlined, 
-         RightSquareTwoTone, CalendarOutlined , HomeOutlined } from '@ant-design/icons';
-
+import { Link, Route, Routes } from 'react-router-dom';
+import { UploadOutlined, RightSquareTwoTone, CalendarOutlined , HomeOutlined, MenuOutlined } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
-
 import { ApiContext } from '../../context/ApiContext';
 import { Formulario, Reserva, Home, ListBookings, Booking } from './index';
 import { ReservaProvider } from './context/reservaContext';
+import { BtnSalir } from '../ui/BtnSalir';
+import { Spinner } from '../ui/Spinner';
 
 
 const { Header, Sider, Content } = Layout;
@@ -16,61 +14,79 @@ const { Header, Sider, Content } = Layout;
 export const NavegacionReservas = () => {
 
   const [ auth, guardarAuth] = useContext(ApiContext);
-    
-  const navigate = useNavigate();
+  const { username } = auth;
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(false); 
+  const [showSpineer, setShowSpinner] = useState(false); 
   
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const salir = () => {  
-    
-    guardarAuth({
-        token: '',
-        auth: false
-    })
+  const toggleCollapsed = () => {
 
-    localStorage.clear()
-    
-    navigate('/');
-  }
+    if(window.innerWidth > 768 && !collapsed)  return;
+    setCollapsed(!collapsed);
+
+  };
 
   return (
-    <Layout>
+    <Layout style={{ minHeight: '100vh' }}>
 
-      <Sider trigger={null} collapsible collapsed={collapsed}>
+      <Sider 
+         collapsible
+         collapsed={collapsed}
+         onCollapse={toggleCollapsed}
+         breakpoint="lg"
+         collapsedWidth="0"
+         trigger={null}         
+         style={{backgroundColor: '#1D2758'}}
+      >
 
         <div className="demo-logo-vertical" />
 
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={['1']}
-          items={[
-            {
-              label: <Link to="/formulario">Home</Link>,
-              key: '1',
-              icon: <HomeOutlined  />,
-            },
-            {
-              label: <Link to="/formulario/new">New Booking</Link>,
-              key: '2',
-              icon: <RightSquareTwoTone />,
-            },
-            {              
-              label: <Link to="/formulario/bookings">Bookings</Link>,
-              key: '3',
-              icon: <UploadOutlined />,
-            },
-            {
-              label: <Link to="/formulario/tracking">Tracking</Link>,
-              key: '4',
-              icon: <CalendarOutlined />,
-            },
-          ]}
-        />
+          <img 
+            height='50rem' 
+            width='100%' 
+            style={{marginTop: '1rem', marginBottom: '1rem'}} 
+            src={require('../ui/img/logo.png')} 
+            alt="Logo" 
+          />
+      
+          <Menu
+            theme="dark"
+            style={{backgroundColor: '#1D2758', fontSize: '17px', fontWeight: 'bold'}}
+            mode="vertical"
+            defaultSelectedKeys={['1']}
+            items={[
+              {
+                label: <Link to="/formulario" onClick={toggleCollapsed}>Home</Link>,
+                key: '1',
+                icon: <HomeOutlined  />,
+              },
+              {
+                label: <Link to="/formulario/new" onClick={toggleCollapsed}>New Booking</Link>,
+                key: '2',
+                icon: <RightSquareTwoTone />,
+              },
+              {              
+                label: <Link to="/formulario/bookings" onClick={toggleCollapsed}>Bookings</Link>,
+                key: '3',
+                icon: <UploadOutlined />,
+              },
+              {
+                label: <Link to="/formulario/tracking" onClick={toggleCollapsed}>Tracking</Link>,
+                key: '4',
+                icon: <CalendarOutlined />,
+              },
+              {
+                label: <BtnSalir  showSpineer={showSpineer} setShowSpinner={setShowSpinner} />,
+                key: '5',                
+              },
+            ]}
+          />
+ 
+       
       </Sider>
 
       <Layout>
@@ -78,30 +94,23 @@ export const NavegacionReservas = () => {
         <Header
           style={{
             padding: 0,
+            height: '10%',
             background: colorBgContainer,
           }}
         >
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: '16px',
-              width: 64,
-              height: 64,
-            }}
-          />
 
-          <Button 
-              type='primary' 
-              danger  
-              onClick={salir}
-              style={{
-                marginLeft: '85%'
-              }}
-            >                      
-              Log-out              
-            </Button>
+      {
+          (collapsed) && (
+
+              <Button type="text" onClick={toggleCollapsed} style={{ marginTop: 10 }}>
+                <MenuOutlined />
+              </Button>            
+          ) 
+          
+      }
+          <p className='header'>  
+            {( username ? username : '')}
+          </p>
 
         </Header>
 
@@ -114,6 +123,10 @@ export const NavegacionReservas = () => {
                 borderRadius: borderRadiusLG,
               }}
             >
+
+              { 
+                (showSpineer) && <Spinner />
+              }
   
               <ReservaProvider>
                 <Routes>
